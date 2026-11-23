@@ -90,7 +90,7 @@ button{width:100%;margin:5px 0}
 
 <div class="control-group" style="margin-top:16px">
   <label>Cartella sul server:</label>
-  <input type="text" id="serverFolder" value="mp3/" placeholder="es. mp3/  oppure audio/  oppure /media/musica/">
+  <input type="text" id="serverFolder" value="./" placeholder="es. mp3/  oppure audio/  oppure /media/musica/">
   <div class="hint">Percorso relativo alla pagina o assoluto. Deve contenere i file audio ed essere raggiungibile via HTTP.</div>
 </div>
 
@@ -261,7 +261,7 @@ Il browser prova in ordine:
 3) directory listing HTML (Apache "Options +Indexes" / nginx autoindex)
 ======================================================================= */
 const SERVER = {
-root: 'mp3/',
+root: './',
 endpoints: ['list.php', 'files.json', 'index.json'],
 exts: ['mp3','wav','ogg','m4a','aac','flac','opus','webm']
 };
@@ -353,7 +353,7 @@ let dirHistory = [];
 
 function openBrowser(){
 $('browserModal').classList.add('open');
-SERVER.root = $('serverFolder').value.trim() || 'mp3/';
+SERVER.root = $('serverFolder').value.trim() || './';
 currentDir = SERVER.root; dirHistory=[];
 loadDirectory(currentDir);
 }
@@ -612,7 +612,7 @@ $('browserModal').onclick = e=>{ if(e.target===$('browserModal')) closeBrowser()
 $('refreshBtn').onclick = ()=> loadDirectory(currentDir);
 $('searchBox').oninput = renderList;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowser(); });
-$('serverFolder').onchange = e=>{ SERVER.root=e.target.value.trim()||'mp3/'; };
+$('serverFolder').onchange = e=>{ SERVER.root=e.target.value.trim()||'./'; };
 
 $('playFileBtn').onclick = playFile;
 $('pauseFileBtn').onclick = pauseFile;
