@@ -1,317 +1,694 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Leonardo — Help desk, manutenzione hardware e software.">
-  <title>Leonardo | Help Desk & Technical Support</title>
-  <style>
-    :root {
-      --bg: #050816;
-      --panel: rgba(15, 23, 42, 0.82);
-      --cyan: #22d3ee;
-      --violet: #a78bfa;
-      --pink: #f472b6;
-      --text: #eef2ff;
-      --muted: #aab3cf;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAM 2.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;padding:20px;color:#fff}
+.container{max-width:1400px;margin:0 auto}
+h1{text-align:center;margin-bottom:25px;font-size:clamp(1.3rem,4vw,2.3rem);text-shadow:2px 2px 4px rgba(0,0,0,.5)}
+h2{font-size:1.1rem}
+.panel{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.control-group{margin-bottom:18px}
+label{display:block;margin-bottom:8px;font-weight:600;font-size:14px}
+input[type=range]{width:100%;height:8px;border-radius:5px;background:rgba(255,255,255,.2);outline:none;-webkit-appearance:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#4CAF50;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:#4CAF50;cursor:pointer}
+input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.25);color:#fff;font-size:14px}
+.value-display{display:inline-block;margin-left:8px;padding:3px 10px;background:rgba(76,175,80,.3);border-radius:5px;font-weight:bold;font-size:13px}
+button{padding:12px 22px;border:0;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:.25s;margin:4px;color:#fff}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);box-shadow:0 4px 15px rgba(102,126,234,.4)}
+.btn-success{background:linear-gradient(135deg,#4CAF50,#45a049)}
+.btn-stop{background:linear-gradient(135deg,#f44336,#d32f2f)}
+.btn-secondary{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.btn-ghost{background:rgba(255,255,255,.12)}
+button:not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.1)}
+select{width:100%;padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:14px;cursor:pointer}
+select option{background:#2a5298}
+.status{text-align:center;padding:12px;background:rgba(0,0,0,.22);border-radius:8px;margin-top:12px;font-size:13px;word-break:break-word}
+.toggle-btn{padding:8px 16px;font-size:14px}
+.toggle-btn.active{background:linear-gradient(135deg,#4CAF50,#45a049)}
+.toggle-btn.inactive{background:rgba(255,255,255,.12)}
+.progress-bar{width:100%;height:10px;background:rgba(255,255,255,.2);border-radius:5px;margin-top:12px;overflow:hidden;cursor:pointer}
+.progress-fill{height:100%;background:linear-gradient(90deg,#4CAF50,#8BC34A);width:0%}
+.time-display{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;opacity:.85}
+.big-open{width:100%;padding:22px;font-size:17px;background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.4);border-radius:12px;cursor:pointer}
+.big-open:hover{background:rgba(255,255,255,.2);border-color:#8BC34A}
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 12% 20%, rgba(34, 211, 238, 0.16), transparent 24rem),
-        radial-gradient(circle at 88% 15%, rgba(167, 139, 250, 0.18), transparent 26rem),
-        linear-gradient(135deg, #050816 0%, #090b20 55%, #130c28 100%);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.14;
-      background-image:
-        linear-gradient(rgba(34, 211, 238, 0.22) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 211, 238, 0.22) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: linear-gradient(to bottom, black, transparent 78%);
-    }
-
-    main {
-      width: min(1120px, calc(100% - 40px));
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 92px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(34, 211, 238, 0.55);
-      border-radius: 12px;
-      color: var(--cyan);
-      background: rgba(34, 211, 238, 0.08);
-      box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
-    }
-
-    .status {
-      color: var(--muted);
-      font-size: 0.82rem;
-      border: 1px solid rgba(167, 139, 250, 0.25);
-      border-radius: 999px;
-      padding: 9px 14px;
-      background: rgba(15, 23, 42, 0.5);
-    }
-
-    .status::before {
-      content: "";
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      margin-right: 8px;
-      border-radius: 50%;
-      background: #34d399;
-      box-shadow: 0 0 12px #34d399;
-    }
-
-    .hero {
-      min-height: calc(100vh - 92px);
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      align-items: center;
-      gap: 48px;
-      padding-bottom: 60px;
-    }
-
-    .eyebrow {
-      color: var(--cyan);
-      font-size: 0.86rem;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 760px;
-      margin: 18px 0 24px;
-      font-size: clamp(3.2rem, 8vw, 7.2rem);
-      line-height: 0.91;
-      letter-spacing: -0.07em;
-    }
-
-    .gradient-text {
-      color: transparent;
-      background: linear-gradient(100deg, var(--cyan), var(--violet) 58%, var(--pink));
-      background-clip: text;
-      -webkit-background-clip: text;
-    }
-
-    .intro {
-      max-width: 650px;
-      color: var(--muted);
-      font-size: clamp(1.05rem, 2vw, 1.28rem);
-      line-height: 1.75;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 34px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0 20px;
-      border-radius: 12px;
-      color: #06111c;
-      background: linear-gradient(100deg, var(--cyan), #67e8f9);
-      font-weight: 800;
-      text-decoration: none;
-      transition: 180ms ease;
-      box-shadow: 0 12px 32px rgba(34, 211, 238, 0.16);
-    }
-
-    .button:hover { transform: translateY(-3px); }
-
-    .button.secondary {
-      color: var(--text);
-      background: rgba(167, 139, 250, 0.08);
-      border: 1px solid rgba(167, 139, 250, 0.38);
-      box-shadow: none;
-    }
-
-    .profile-card {
-      position: relative;
-      min-height: 430px;
-      border: 1px solid rgba(34, 211, 238, 0.18);
-      border-radius: 28px;
-      padding: 28px;
-      background: var(--panel);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
-    }
-
-    .profile-card::before,
-    .profile-card::after {
-      content: "";
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      border-style: solid;
-      border-color: var(--violet);
-      opacity: 0.75;
-    }
-
-    .profile-card::before {
-      top: -10px;
-      right: -10px;
-      border-width: 2px 2px 0 0;
-      border-radius: 0 28px 0 0;
-    }
-
-    .profile-card::after {
-      bottom: -10px;
-      left: -10px;
-      border-width: 0 0 2px 2px;
-      border-radius: 0 0 0 28px;
-    }
-
-    .terminal-bar {
-      display: flex;
-      gap: 7px;
-      margin-bottom: 28px;
-    }
-
-    .terminal-bar span {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--pink);
-    }
-
-    .terminal-bar span:nth-child(2) { background: #facc15; }
-    .terminal-bar span:nth-child(3) { background: #34d399; }
-
-    .role {
-      display: inline-block;
-      margin-bottom: 16px;
-      color: var(--pink);
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.85rem;
-    }
-
-    .experience {
-      margin: 0;
-      font-size: 5.5rem;
-      line-height: 1;
-      letter-spacing: -0.07em;
-      background: linear-gradient(135deg, var(--text), var(--cyan));
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .experience-label {
-      color: var(--muted);
-      margin: 8px 0 30px;
-    }
-
-    .skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .skill {
-      border: 1px solid rgba(34, 211, 238, 0.22);
-      border-radius: 999px;
-      padding: 8px 11px;
-      color: #c8fbff;
-      background: rgba(34, 211, 238, 0.05);
-      font-size: 0.82rem;
-    }
-
-    @media (max-width: 820px) {
-      nav { height: 76px; }
-      .status { display: none; }
-      .hero {
-        min-height: auto;
-        grid-template-columns: 1fr;
-        padding: 70px 0;
-      }
-      h1 { font-size: clamp(3.2rem, 16vw, 5.5rem); }
-      .profile-card { min-height: 360px; }
-    }
-  </style>
+/* ===== MODAL BROWSER SERVER ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:linear-gradient(160deg,#22315c,#16233f);border:1px solid rgba(255,255,255,.15);border-radius:16px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+.modal-head{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.modal-head h3{flex:1;font-size:1.1rem;min-width:160px}
+.modal-close{background:rgba(255,255,255,.15);padding:8px 14px;margin:0;font-size:16px}
+.modal-tools{padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08)}
+.modal-tools input[type=text]{flex:1;min-width:140px}
+.breadcrumb{padding:10px 20px;font-size:13px;background:rgba(0,0,0,.25);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.breadcrumb a{color:#8BC34A;cursor:pointer;text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+.file-list{overflow-y:auto;flex:1;padding:8px 12px;min-height:180px}
+.file-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:4px;background:rgba(255,255,255,.04)}
+.file-item:hover{background:rgba(139,195,74,.22);transform:translateX(4px)}
+.file-item.playing{background:rgba(76,175,80,.3);border-left:4px solid #8BC34A}
+.file-icon{font-size:22px;flex-shrink:0}
+.file-info{flex:1;min-width:0}
+.file-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta{font-size:11px;opacity:.65;margin-top:2px}
+.file-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.15);flex-shrink:0}
+.empty-msg{text-align:center;padding:30px 20px;opacity:.8;font-size:14px;line-height:1.7}
+.spinner{width:34px;height:34px;border:4px solid rgba(255,255,255,.2);border-top-color:#8BC34A;border-radius:50%;animation:spin .8s linear infinite;margin:24px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{font-size:12px;opacity:.7;line-height:1.6;margin-top:10px}
+code{background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;font-size:12px}
+@media(max-width:768px){
+body{padding:12px}
+.grid{grid-template-columns:1fr}
+button{width:100%;margin:5px 0}
+.modal-overlay{padding:0}
+.modal{max-width:100%;max-height:100vh;height:100%;border-radius:0}
+.modal-tools button{width:auto}
+.modal-head button{width:auto}
+}
+</style>
 </head>
 <body>
-  <main>
-    <nav aria-label="Navigazione principale">
-      <div class="brand">
-        <span class="brand-mark">L</span>
-        Leonardo
-      </div>
-      <div class="status">Disponibile per contatti</div>
-    </nav>
+<div class="container">
+<h1>🎛️ WAM 2.0 — Server MP3 Browser + FX</h1>
 
-    <section class="hero">
-      <div>
-        <div class="eyebrow">Help Desk &amp; Technical Support</div>
-        <h1>Leonardo.<br><span class="gradient-text">Tecnico IT.</span></h1>
-        <p class="intro">
-          Help desker da 20 anni, specializzato in manutenzione e assistenza su
-          <strong>hardware e software</strong>. Risolvo problemi tecnici con metodo,
-          esperienza e attenzione alle persone.
-        </p>
-        <div class="actions">
-          <a class="button" href="mailto:tecnicionline@gmail.com">Contattami</a>
-          <a class="button secondary" href="mailto:tecnicionline@gmail.com?subject=Richiesta%20assistenza%20tecnica">Richiedi assistenza</a>
-        </div>
-      </div>
+<div class="grid">
+<!-- ============ PLAYER + BROWSER SERVER ============ -->
+<div class="panel" style="grid-column:1/-1">
+<h2 style="margin-bottom:15px">📂 Libreria Audio sul Server</h2>
+<button class="big-open" id="openBrowserBtn">
+  📁 Clicca per selezionare un file audio (MP3, WAV, OGG, etc.)
+</button>
 
-      <aside class="profile-card" aria-label="Esperienza professionale">
-        <div class="terminal-bar" aria-hidden="true"><span></span><span></span><span></span></div>
-        <span class="role">&gt; expert_profile.run()</span>
-        <p class="experience">20+</p>
-        <p class="experience-label">anni di esperienza tecnica</p>
-        <div class="skills" aria-label="Competenze">
-          <span class="skill">Help Desk</span>
-          <span class="skill">Hardware</span>
-          <span class="skill">Software</span>
-          <span class="skill">Manutenzione</span>
-          <span class="skill">Assistenza IT</span>
-          <span class="skill">Diagnostica</span>
-        </div>
-      </aside>
-    </section>
-  </main>
+<div class="control-group" style="margin-top:16px">
+  <label>Cartella sul server:</label>
+  <input type="text" id="serverFolder" value="mp3/" placeholder="es. mp3/  oppure audio/  oppure /media/musica/">
+  <div class="hint">Percorso relativo alla pagina o assoluto. Deve contenere i file audio ed essere raggiungibile via HTTP.</div>
+</div>
+
+<div style="margin-top:14px">
+  <button id="playFileBtn" class="btn-success" disabled>▶️ Play</button>
+  <button id="pauseFileBtn" class="btn-secondary" disabled>⏸️ Pausa</button>
+  <button id="stopFileBtn" class="btn-stop" disabled>⏹️ Stop</button>
+  <button id="loopBtn" class="btn-ghost toggle-btn inactive">🔁 Loop: OFF</button>
+</div>
+
+<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="time-display"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
+<div class="status" id="fileStatus">Nessun file caricato — apri la libreria per scegliere un brano.</div>
+</div>
+
+<!-- ============ EFFETTI ============ -->
+<div class="panel">
+<h2 style="margin-bottom:15px">🎵 BPM Globale</h2>
+<div class="control-group">
+<label>Tempo (BPM):<span class="value-display" id="bpmValue">120</span></label>
+<input type="range" id="bpmSlider" min="40" max="240" value="120" step="1">
+</div>
+<button id="bpmSyncBtn" class="btn-ghost toggle-btn inactive">Sync Delay al BPM: OFF</button>
+<div class="hint">Con Sync attivo il delay segue il tempo (1/4 di battuta).</div>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🔊 Filtro</h2>
+<div class="control-group">
+<label>Frequenza di Taglio:<span class="value-display" id="filterFreqValue">20000 Hz</span></label>
+<input type="range" id="filterFreq" min="20" max="20000" value="20000" step="10">
+</div>
+<div class="control-group">
+<label>Risonanza (Q):<span class="value-display" id="filterQValue">1.0</span></label>
+<input type="range" id="filterQ" min="0.1" max="20" value="1" step="0.1">
+</div>
+<div class="control-group">
+<label>Tipo Filtro:</label>
+<select id="filterType">
+<option value="lowpass">Low Pass</option><option value="highpass">High Pass</option>
+<option value="bandpass">Band Pass</option><option value="notch">Notch</option>
+</select>
+</div>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🔁 Delay</h2>
+<div class="control-group">
+<label>Tempo Delay:<span class="value-display" id="delayTimeValue">0.30 s</span></label>
+<input type="range" id="delayTime" min="0.01" max="2" value="0.3" step="0.01">
+</div>
+<div class="control-group">
+<label>Feedback:<span class="value-display" id="delayFeedbackValue">0.40</span></label>
+<input type="range" id="delayFeedback" min="0" max="0.9" value="0.4" step="0.01">
+</div>
+<div class="control-group">
+<label>Mix:<span class="value-display" id="delayMixValue">0.30</span></label>
+<input type="range" id="delayMix" min="0" max="1" value="0.3" step="0.01">
+</div>
+<button id="delayToggle" class="btn-secondary toggle-btn active">Delay: ON</button>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🌊 Chorus</h2>
+<div class="control-group">
+<label>Profondità:<span class="value-display" id="chorusDepthValue">0.0020</span></label>
+<input type="range" id="chorusDepth" min="0" max="0.01" value="0.002" step="0.0001">
+</div>
+<div class="control-group">
+<label>Velocità:<span class="value-display" id="chorusRateValue">1.5 Hz</span></label>
+<input type="range" id="chorusRate" min="0.1" max="10" value="1.5" step="0.1">
+</div>
+<div class="control-group">
+<label>Mix:<span class="value-display" id="chorusMixValue">0.50</span></label>
+<input type="range" id="chorusMix" min="0" max="1" value="0.5" step="0.01">
+</div>
+<button id="chorusToggle" class="btn-secondary toggle-btn inactive">Chorus: OFF</button>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">💥 Bitcrusher</h2>
+<div class="control-group">
+<label>Bits:<span class="value-display" id="bitcrusherBitsValue">16</span></label>
+<input type="range" id="bitcrusherBits" min="1" max="16" value="16" step="1">
+</div>
+<div class="control-group">
+<label>Sample Rate Reduction:<span class="value-display" id="bitcrusherSampleRateValue">1.00</span></label>
+<input type="range" id="bitcrusherSampleRate" min="0.05" max="1" value="1" step="0.01">
+</div>
+<div class="control-group">
+<label>Mix:<span class="value-display" id="bitcrusherMixValue">0.50</span></label>
+<input type="range" id="bitcrusherMix" min="0" max="1" value="0.5" step="0.01">
+</div>
+<button id="bitcrusherToggle" class="btn-secondary toggle-btn inactive">Bitcrusher: OFF</button>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🎼 Legato (Fade)</h2>
+<div class="control-group">
+<label>Glide / Fade Time:<span class="value-display" id="legatoGlideValue">0.10 s</span></label>
+<input type="range" id="legatoGlide" min="0" max="2" value="0.1" step="0.01">
+</div>
+<button id="legatoToggle" class="btn-secondary toggle-btn inactive">Legato: OFF</button>
+<div class="hint">Su un file audio il legato applica una dissolvenza morbida su play/stop/cambio traccia.</div>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🎹 Preset Scala</h2>
+<div class="control-group">
+<label>Seleziona Scala:</label>
+<select id="scalePreset">
+<option value="chromatic">Cromatica</option><option value="major">Maggiore</option>
+<option value="minor">Minore Naturale</option><option value="pentatonic">Pentatonica Maggiore</option>
+<option value="pentatonicMinor">Pentatonica Minore</option><option value="blues">Blues</option>
+<option value="dorian">Dorica</option><option value="phrygian">Frigia</option>
+<option value="lydian">Lidia</option><option value="mixolydian">Mixolidia</option>
+<option value="locrian">Locria</option><option value="harmonicMinor">Minore Armonica</option>
+<option value="melodicMinor">Minore Melodica</option>
+</select>
+</div>
+<div class="control-group">
+<label>Nota Fondamentale:<span class="value-display" id="rootNoteValue">C4</span></label>
+<select id="rootNote">
+<option value="60">C4</option><option value="61">C#4</option><option value="62">D4</option>
+<option value="63">D#4</option><option value="64">E4</option><option value="65">F4</option>
+<option value="66">F#4</option><option value="67">G4</option><option value="68">G#4</option>
+<option value="69">A4</option><option value="70">A#4</option><option value="71">B4</option>
+</select>
+</div>
+<div class="hint">Riferimento tonale per usi futuri (nessun synth interno attivo).</div>
+</div>
+
+<div class="panel">
+<h2 style="margin-bottom:15px">🔈 Volume Master</h2>
+<div class="control-group">
+<label>Volume:<span class="value-display" id="masterVolumeValue">0.70</span></label>
+<input type="range" id="masterVolume" min="0" max="1" value="0.7" step="0.01">
+</div>
+<button id="resetFxBtn" class="btn-ghost">↺ Reset Effetti</button>
+</div>
+</div>
+</div>
+
+<!-- ============ MODAL: BROWSER FILE SERVER ============ -->
+<div class="modal-overlay" id="browserModal">
+<div class="modal">
+<div class="modal-head">
+<h3>📂 Libreria Server</h3>
+<button class="btn-ghost" id="refreshBtn" style="padding:8px 14px;margin:0">🔄</button>
+<button class="modal-close" id="closeBrowserBtn">✕</button>
+</div>
+<div class="modal-tools">
+<input type="text" id="searchBox" placeholder="🔍 Cerca file…">
+<button class="btn-ghost" id="localFileBtn" style="margin:0;padding:10px 14px;font-size:13px">💻 File locale</button>
+<input type="file" id="localFileInput" accept="audio/*" style="display:none">
+</div>
+<div class="breadcrumb" id="breadcrumb"></div>
+<div class="file-list" id="fileList"></div>
+</div>
+</div>
+
+<script>
+/* =======================================================================
+CONFIGURAZIONE SERVER
+Il browser prova in ordine:
+1) list.php?dir=... (JSON consigliato - vedi file list.php)
+2) files.json / index.json (lista statica)
+3) directory listing HTML (Apache "Options +Indexes" / nginx autoindex)
+======================================================================= */
+const SERVER = {
+root: 'mp3/',
+endpoints: ['list.php', 'files.json', 'index.json'],
+exts: ['mp3','wav','ogg','m4a','aac','flac','opus','webm']
+};
+
+/* ---------- STATO AUDIO ---------- */
+let audioContext, filter, dryGain, masterGain;
+let delayNode, delayFeedback, delayMix;
+let chorusNode, chorusLFO, chorusDepthGain, chorusMixGain;
+let bitcrusherNode, bcMixGain;
+let bcBits = 16, bcRate = 1;
+
+let currentBPM = 120, bpmSync = false;
+let chorusEnabled = false, bitcrusherEnabled = false, delayEnabled = true;
+let legatoEnabled = false, legatoGlide = 0.1, loopEnabled = false;
+
+let audioBuffer = null, fileSource = null;
+let isFilePlaying = false, isFilePaused = false;
+let startTime = 0, pauseTime = 0, currentURL = '', currentName = '';
+let rafId = null;
+
+/* ---------- INIT AUDIO GRAPH ---------- */
+function initAudio(){
+if(audioContext) return;
+audioContext = new (window.AudioContext||window.webkitAudioContext)();
+
+masterGain = audioContext.createGain(); masterGain.gain.value = 0.7;
+masterGain.connect(audioContext.destination);
+
+dryGain = audioContext.createGain(); dryGain.gain.value = 1;
+dryGain.connect(masterGain);
+
+filter = audioContext.createBiquadFilter();
+filter.type='lowpass'; filter.frequency.value=20000; filter.Q.value=1;
+filter.connect(dryGain);
+
+// Delay
+delayNode = audioContext.createDelay(2.0); delayNode.delayTime.value=0.3;
+delayFeedback = audioContext.createGain(); delayFeedback.gain.value=0.4;
+delayMix = audioContext.createGain(); delayMix.gain.value=0.3;
+filter.connect(delayNode);
+delayNode.connect(delayFeedback); delayFeedback.connect(delayNode);
+delayNode.connect(delayMix); delayMix.connect(masterGain);
+
+// Chorus
+chorusNode = audioContext.createDelay(0.05); chorusNode.delayTime.value=0.015;
+chorusLFO = audioContext.createOscillator(); chorusLFO.frequency.value=1.5;
+chorusDepthGain = audioContext.createGain(); chorusDepthGain.gain.value=0.002;
+chorusMixGain = audioContext.createGain(); chorusMixGain.gain.value=0;
+chorusLFO.connect(chorusDepthGain); chorusDepthGain.connect(chorusNode.delayTime);
+chorusLFO.start();
+filter.connect(chorusNode); chorusNode.connect(chorusMixGain); chorusMixGain.connect(masterGain);
+
+// Bitcrusher
+bitcrusherNode = audioContext.createScriptProcessor(4096,2,2);
+let phL=0,phR=0,lastL=0,lastR=0;
+bitcrusherNode.onaudioprocess = e=>{
+const inL=e.inputBuffer.getChannelData(0);
+const inR=e.inputBuffer.numberOfChannels>1?e.inputBuffer.getChannelData(1):inL;
+const outL=e.outputBuffer.getChannelData(0);
+const outR=e.outputBuffer.getChannelData(1);
+const step=Math.pow(0.5,bcBits);
+for(let i=0;i<inL.length;i++){
+phL+=bcRate; if(phL>=1){phL-=1; lastL=Math.round(inL[i]/step)*step;}
+phR+=bcRate; if(phR>=1){phR-=1; lastR=Math.round(inR[i]/step)*step;}
+outL[i]=lastL; outR[i]=lastR;
+}
+};
+bcMixGain = audioContext.createGain(); bcMixGain.gain.value=0;
+filter.connect(bitcrusherNode); bitcrusherNode.connect(bcMixGain); bcMixGain.connect(masterGain);
+}
+
+/* ---------- UTILS ---------- */
+const $ = id => document.getElementById(id);
+function formatTime(s){ if(!isFinite(s)||s<0)s=0; const m=Math.floor(s/60); return m+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+function fmtSize(b){ if(!b&&b!==0) return ''; if(b<1024)return b+' B'; if(b<1048576)return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+function isAudio(name){ return SERVER.exts.includes(name.split('.').pop().toLowerCase().split('?')[0]); }
+function joinPath(base,name){ return base.replace(/\/+$/,'')+'/'+name.replace(/^\/+/,''); }
+function iconFor(name){
+const e=name.split('.').pop().toLowerCase();
+return {mp3:'🎵',wav:'🎚️',ogg:'🎶',m4a:'🎧',aac:'🎧',flac:'💎',opus:'🎼',webm:'🎬'}[e]||'🎵';
+}
+
+/* =======================================================================
+BROWSER FILE SERVER
+======================================================================= */
+let currentDir = SERVER.root;
+let allEntries = [];
+let dirHistory = [];
+
+function openBrowser(){
+$('browserModal').classList.add('open');
+SERVER.root = $('serverFolder').value.trim() || 'mp3/';
+currentDir = SERVER.root; dirHistory=[];
+loadDirectory(currentDir);
+}
+function closeBrowser(){ $('browserModal').classList.remove('open'); }
+
+async function loadDirectory(dir){
+currentDir = dir;
+renderBreadcrumb();
+$('fileList').innerHTML = '<div class="spinner"></div>';
+allEntries = [];
+
+if(location.protocol === 'file:'){
+showBrowserError('⚠️ Pagina aperta come <code>file://</code>.<br>Il browser server funziona solo via HTTP.<br>Avvia un server locale, es:<br><code>python -m http.server 8000</code><br>poi apri <code>http://localhost:8000/185.html</code>');
+return;
+}
+
+// 1) endpoint JSON (list.php o files.json)
+for(const ep of SERVER.endpoints){
+try{
+const url = joinPath(SERVER.root, ep) + '?dir=' + encodeURIComponent(dir);
+const res = await fetch(url, {cache:'no-store'});
+if(!res.ok) continue;
+const ct = res.headers.get('content-type')||'';
+if(!ct.includes('json') && !ep.endsWith('.json')) {
+const txt = await res.text();
+try{ const j=JSON.parse(txt); if(parseJsonList(j,dir)) return; }catch(_){ continue; }
+} else {
+const j = await res.json();
+if(parseJsonList(j,dir)) return;
+}
+}catch(_){}
+}
+
+// 2) directory listing HTML (autoindex)
+try{
+const res = await fetch(dir, {cache:'no-store'});
+if(res.ok){
+const html = await res.text();
+if(parseAutoIndex(html,dir)) return;
+}
+}catch(_){}
+
+showBrowserError('❌ Impossibile leggere la cartella <code>'+dir+'</code>.<br><br>'+
+'<b>Soluzioni:</b><br>'+
+'1. Carica <code>list.php</code> dentro la cartella (vedi file fornito).<br>'+
+'2. Oppure crea <code>files.json</code>: <code>{"files":["a.mp3","b.mp3"]}</code><br>'+
+'3. Oppure abilita il directory listing:<br>Apache: <code>Options +Indexes</code> — nginx: <code>autoindex on;</code><br>'+
+'4. Python: <code>python -m http.server</code> (listing attivo di default).');
+}
+
+function parseJsonList(j,dir){
+let items = Array.isArray(j) ? j : (j.files || j.items || j.entries || null);
+if(!Array.isArray(items) || !items.length) return false;
+allEntries = items.map(it=>{
+if(typeof it === 'string') return {name:it.split('/').pop(), path: it.startsWith('http')||it.startsWith('/') ? it : joinPath(dir,it), type:'file', size:null};
+return {
+name: it.name || it.file || '',
+path: it.url || it.path || joinPath(dir, it.name||it.file||''),
+type: (it.type==='dir'||it.dir) ? 'dir' : 'file',
+size: it.size ?? null,
+duration: it.duration ?? null
+};
+}).filter(e=>e.name && (e.type==='dir' || isAudio(e.name)));
+if(!allEntries.length) return false;
+renderList(); return true;
+}
+
+function parseAutoIndex(html,dir){
+const doc = new DOMParser().parseFromString(html,'text/html');
+const links = [...doc.querySelectorAll('a[href]')];
+const out = [];
+links.forEach(a=>{
+let href = a.getAttribute('href');
+if(!href || href.startsWith('?') || href.startsWith('#') || href.startsWith('mailto:')) return;
+if(href==='../' || href==='..' || href==='/') return;
+let name = decodeURIComponent(href.replace(/\/$/,'').split('/').pop());
+if(!name || name.startsWith('.')) return;
+if(/^\//.test(href) && !href.startsWith(dir)) return; // link fuori cartella
+const isDir = href.endsWith('/');
+if(!isDir && !isAudio(name)) return;
+if(out.some(o=>o.name===name)) return;
+// prova a leggere la dimensione dal testo della riga (autoindex Apache/Python)
+let size=null;
+const row = a.parentElement ? a.parentElement.textContent : '';
+const m = row.match(/(\d+(?:\.\d+)?)\s*(K|M|G|KiB|MiB)?\s*$/i);
+out.push({name, path: new URL(href, new URL(dir, location.href)).href, type:isDir?'dir':'file', size});
+});
+if(!out.length) return false;
+allEntries = out;
+renderList(); return true;
+}
+
+function showBrowserError(msg){
+$('fileList').innerHTML = '<div class="empty-msg">'+msg+'</div>';
+}
+
+function renderBreadcrumb(){
+const parts = currentDir.split('/').filter(Boolean);
+let html = '<span>📁</span>', acc='';
+parts.forEach((p,i)=>{
+acc += p+'/';
+const target = acc;
+html += '<a data-dir="'+target+'">'+p+'</a>';
+if(i<parts.length-1) html += '<span>/</span>';
+});
+if(dirHistory.length) html += ' <a id="upDir" style="margin-left:auto">⬆️ Su</a>';
+$('breadcrumb').innerHTML = html;
+$('breadcrumb').querySelectorAll('a[data-dir]').forEach(a=>{
+a.onclick = ()=>{ dirHistory=[]; loadDirectory(a.dataset.dir); };
+});
+const up = $('upDir');
+if(up) up.onclick = ()=>{ const prev=dirHistory.pop(); if(prev!==undefined) loadDirectory(prev); };
+}
+
+function renderList(){
+const q = $('searchBox').value.toLowerCase().trim();
+const items = allEntries
+.filter(e=>e.name.toLowerCase().includes(q))
+.sort((a,b)=> (a.type===b.type) ? a.name.localeCompare(b.name) : (a.type==='dir'?-1:1));
+
+if(!items.length){
+$('fileList').innerHTML = '<div class="empty-msg">🔍 Nessun file audio trovato in questa cartella.</div>';
+return;
+}
+$('fileList').innerHTML = items.map((e,i)=>{
+const playing = (e.path===currentURL) ? ' playing':'';
+const meta = e.type==='dir' ? 'Cartella' : [e.size?fmtSize(e.size):'', e.duration?formatTime(e.duration):''].filter(Boolean).join(' • ') || e.name.split('.').pop().toUpperCase();
+return '<div class="file-item'+playing+'" data-i="'+i+'">'+
+'<div class="file-icon">'+(e.type==='dir'?'📁':iconFor(e.name))+'</div>'+
+'<div class="file-info"><div class="file-name">'+e.name+'</div><div class="file-meta">'+meta+'</div></div>'+
+'<div class="file-badge">'+(e.type==='dir'?'APRI':'CARICA')+'</div></div>';
+}).join('');
+
+$('fileList').querySelectorAll('.file-item').forEach(el=>{
+el.onclick = ()=>{
+const e = items[+el.dataset.i];
+if(e.type==='dir'){ dirHistory.push(currentDir); loadDirectory(e.path.endsWith('/')?e.path:e.path+'/'); }
+else loadFromServer(e.path, e.name);
+};
+});
+}
+
+/* ---------- CARICAMENTO DA SERVER ---------- */
+async function loadFromServer(url,name){
+initAudio();
+if(audioContext.state==='suspended') await audioContext.resume();
+stopFile();
+$('fileStatus').textContent = '⏳ Download di "'+name+'" in corso…';
+closeBrowser();
+try{
+const res = await fetch(url);
+if(!res.ok) throw new Error('HTTP '+res.status);
+const buf = await res.arrayBuffer();
+audioBuffer = await audioContext.decodeAudioData(buf);
+currentURL = url; currentName = name;
+$('fileStatus').textContent = '✓ '+name+' — '+audioBuffer.duration.toFixed(1)+'s • '+audioBuffer.numberOfChannels+'ch • '+audioBuffer.sampleRate+'Hz';
+enablePlayer(true);
+playFile();
+}catch(err){
+$('fileStatus').textContent = '❌ Errore caricamento "'+name+'": '+err.message;
+}
+}
+
+/* ---------- CARICAMENTO LOCALE (fallback) ---------- */
+$('localFileBtn').onclick = ()=> $('localFileInput').click();
+$('localFileInput').onchange = async e=>{
+const f = e.target.files[0]; if(!f) return;
+initAudio(); stopFile(); closeBrowser();
+$('fileStatus').textContent = '⏳ Decodifica locale…';
+try{
+audioBuffer = await audioContext.decodeAudioData(await f.arrayBuffer());
+currentURL=''; currentName=f.name;
+$('fileStatus').textContent = '✓ '+f.name+' (locale) — '+audioBuffer.duration.toFixed(1)+'s';
+enablePlayer(true); playFile();
+}catch(err){ $('fileStatus').textContent='❌ File non decodificabile: '+err.message; }
+};
+
+/* ---------- PLAYER ---------- */
+function enablePlayer(on){ ['playFileBtn','pauseFileBtn','stopFileBtn'].forEach(id=>$(id).disabled=!on); }
+
+function fade(param,target,time){
+const now=audioContext.currentTime;
+param.cancelScheduledValues(now);
+param.setValueAtTime(param.value,now);
+param.linearRampToValueAtTime(target,now+Math.max(0.005,time));
+}
+
+function playFile(){
+if(!audioBuffer) return;
+initAudio();
+if(audioContext.state==='suspended') audioContext.resume();
+if(isFilePlaying) return;
+
+const offset = isFilePaused ? pauseTime : 0;
+fileSource = audioContext.createBufferSource();
+fileSource.buffer = audioBuffer;
+fileSource.loop = loopEnabled;
+fileSource.connect(filter);
+
+const g = legatoEnabled ? legatoGlide : 0.01;
+masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+masterGain.gain.setValueAtTime(0.0001,audioContext.currentTime);
+masterGain.gain.linearRampToValueAtTime(parseFloat($('masterVolume').value),audioContext.currentTime+g);
+
+fileSource.start(0, offset);
+startTime = audioContext.currentTime;
+if(!isFilePaused) pauseTime = 0;
+isFilePlaying = true; isFilePaused = false;
+
+fileSource.onended = ()=>{ if(isFilePlaying && !isFilePaused && !loopEnabled){ stopFile(); } };
+$('totalTime').textContent = formatTime(audioBuffer.duration);
+tick();
+}
+
+function pauseFile(){
+if(!isFilePlaying) return;
+pauseTime += audioContext.currentTime - startTime;
+isFilePlaying = false; isFilePaused = true;
+const done = ()=>{ try{fileSource.onended=null;fileSource.stop();}catch(_){} };
+if(legatoEnabled){ fade(masterGain.gain,0.0001,legatoGlide); setTimeout(done,legatoGlide*1000); } else done();
+cancelAnimationFrame(rafId);
+}
+
+function stopFile(){
+cancelAnimationFrame(rafId);
+if(fileSource){ try{fileSource.onended=null;fileSource.stop();}catch(_){} fileSource=null; }
+isFilePlaying=false; isFilePaused=false; pauseTime=0;
+$('progressFill').style.width='0%'; $('currentTime').textContent='0:00';
+if(masterGain && audioContext) masterGain.gain.setValueAtTime(parseFloat($('masterVolume').value),audioContext.currentTime);
+}
+
+function tick(){
+if(!isFilePlaying||!audioBuffer) return;
+let t = audioContext.currentTime - startTime + pauseTime;
+if(loopEnabled) t = t % audioBuffer.duration;
+$('progressFill').style.width = Math.min(t/audioBuffer.duration*100,100)+'%';
+$('currentTime').textContent = formatTime(t);
+rafId = requestAnimationFrame(tick);
+}
+
+$('progressBar').onclick = e=>{
+if(!audioBuffer) return;
+const r = e.currentTarget.getBoundingClientRect();
+const pos = Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)) * audioBuffer.duration;
+const wasPlaying = isFilePlaying;
+if(fileSource){ try{fileSource.onended=null;fileSource.stop();}catch(_){} }
+isFilePlaying=false; isFilePaused=true; pauseTime=pos;
+if(wasPlaying) playFile();
+else { $('progressFill').style.width=(pos/audioBuffer.duration*100)+'%'; $('currentTime').textContent=formatTime(pos); }
+};
+
+/* ---------- EVENTI UI ---------- */
+$('openBrowserBtn').onclick = openBrowser;
+$('closeBrowserBtn').onclick = closeBrowser;
+$('browserModal').onclick = e=>{ if(e.target===$('browserModal')) closeBrowser(); };
+$('refreshBtn').onclick = ()=> loadDirectory(currentDir);
+$('searchBox').oninput = renderList;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowser(); });
+$('serverFolder').onchange = e=>{ SERVER.root=e.target.value.trim()||'mp3/'; };
+
+$('playFileBtn').onclick = playFile;
+$('pauseFileBtn').onclick = pauseFile;
+$('stopFileBtn').onclick = stopFile;
+$('loopBtn').onclick = e=>{
+loopEnabled=!loopEnabled;
+e.target.textContent='🔁 Loop: '+(loopEnabled?'ON':'OFF');
+e.target.classList.toggle('active',loopEnabled); e.target.classList.toggle('inactive',!loopEnabled);
+if(fileSource) fileSource.loop=loopEnabled;
+};
+
+function applyBpmDelay(){ if(bpmSync&&delayNode){ const t=60/currentBPM; delayNode.delayTime.value=Math.min(t,2); $('delayTimeValue').textContent=Math.min(t,2).toFixed(2)+' s'; $('delayTime').value=Math.min(t,2);} }
+$('bpmSlider').oninput = e=>{ currentBPM=+e.target.value; $('bpmValue').textContent=currentBPM; applyBpmDelay(); };
+$('bpmSyncBtn').onclick = e=>{ bpmSync=!bpmSync; e.target.textContent='Sync Delay al BPM: '+(bpmSync?'ON':'OFF'); e.target.classList.toggle('active',bpmSync); e.target.classList.toggle('inactive',!bpmSync); applyBpmDelay(); };
+
+$('filterFreq').oninput = e=>{ if(filter)filter.frequency.value=+e.target.value; $('filterFreqValue').textContent=e.target.value+' Hz'; };
+$('filterQ').oninput = e=>{ if(filter)filter.Q.value=+e.target.value; $('filterQValue').textContent=(+e.target.value).toFixed(1); };
+$('filterType').onchange = e=>{ if(filter)filter.type=e.target.value; };
+
+$('delayTime').oninput = e=>{ if(delayNode)delayNode.delayTime.value=+e.target.value; $('delayTimeValue').textContent=(+e.target.value).toFixed(2)+' s'; };
+$('delayFeedback').oninput = e=>{ if(delayFeedback)delayFeedback.gain.value=+e.target.value; $('delayFeedbackValue').textContent=(+e.target.value).toFixed(2); };
+$('delayMix').oninput = e=>{ if(delayMix)delayMix.gain.value=+e.target.value; $('delayMixValue').textContent=(+e.target.value).toFixed(2); };
+$('delayToggle').onclick = e=>{
+delayEnabled=!delayEnabled;
+e.target.textContent='Delay: '+(delayEnabled?'ON':'OFF');
+e.target.classList.toggle('active',delayEnabled); e.target.classList.toggle('inactive',!delayEnabled);
+if(delayMix) delayMix.gain.value = delayEnabled ? +$('delayMix').value : 0;
+};
+
+$('chorusDepth').oninput = e=>{ if(chorusDepthGain)chorusDepthGain.gain.value=+e.target.value; $('chorusDepthValue').textContent=(+e.target.value).toFixed(4); };
+$('chorusRate').oninput = e=>{ if(chorusLFO)chorusLFO.frequency.value=+e.target.value; $('chorusRateValue').textContent=(+e.target.value).toFixed(1)+' Hz'; };
+$('chorusMix').oninput = e=>{ $('chorusMixValue').textContent=(+e.target.value).toFixed(2); if(chorusEnabled)chorusMixGain.gain.value=+e.target.value; };
+$('chorusToggle').onclick = e=>{
+chorusEnabled=!chorusEnabled;
+e.target.textContent='Chorus: '+(chorusEnabled?'ON':'OFF');
+e.target.classList.toggle('active',chorusEnabled); e.target.classList.toggle('inactive',!chorusEnabled);
+if(chorusMixGain) chorusMixGain.gain.value = chorusEnabled ? +$('chorusMix').value : 0;
+};
+
+function updateCrush(){
+if(!bcMixGain) return;
+const m = +$('bitcrusherMix').value;
+bcMixGain.gain.value = bitcrusherEnabled ? m : 0;
+dryGain.gain.value = bitcrusherEnabled ? (1-m) : 1;
+}
+$('bitcrusherBits').oninput = e=>{ bcBits=+e.target.value; $('bitcrusherBitsValue').textContent=e.target.value; };
+$('bitcrusherSampleRate').oninput = e=>{ bcRate=+e.target.value; $('bitcrusherSampleRateValue').textContent=(+e.target.value).toFixed(2); };
+$('bitcrusherMix').oninput = e=>{ $('bitcrusherMixValue').textContent=(+e.target.value).toFixed(2); updateCrush(); };
+$('bitcrusherToggle').onclick = e=>{
+bitcrusherEnabled=!bitcrusherEnabled;
+e.target.textContent='Bitcrusher: '+(bitcrusherEnabled?'ON':'OFF');
+e.target.classList.toggle('active',bitcrusherEnabled); e.target.classList.toggle('inactive',!bitcrusherEnabled);
+updateCrush();
+};
+
+$('legatoGlide').oninput = e=>{ legatoGlide=+e.target.value; $('legatoGlideValue').textContent=legatoGlide.toFixed(2)+' s'; };
+$('legatoToggle').onclick = e=>{
+legatoEnabled=!legatoEnabled;
+e.target.textContent='Legato: '+(legatoEnabled?'ON':'OFF');
+e.target.classList.toggle('active',legatoEnabled); e.target.classList.toggle('inactive',!legatoEnabled);
+};
+
+$('masterVolume').oninput = e=>{
+const v=+e.target.value; $('masterVolumeValue').textContent=v.toFixed(2);
+if(masterGain&&isFilePlaying) masterGain.gain.value=v;
+};
+
+$('resetFxBtn').onclick = ()=>{
+const def={filterFreq:20000,filterQ:1,delayTime:0.3,delayFeedback:0.4,delayMix:0.3,chorusDepth:0.002,chorusRate:1.5,chorusMix:0.5,bitcrusherBits:16,bitcrusherSampleRate:1,bitcrusherMix:0.5,masterVolume:0.7};
+Object.entries(def).forEach(([id,v])=>{ const el=$(id); el.value=v; el.dispatchEvent(new Event('input')); });
+$('filterType').value='lowpass'; if(filter)filter.type='lowpass';
+};
+
+// sblocco audio al primo tocco (mobile)
+document.addEventListener('touchstart',()=>{ initAudio(); if(audioContext.state==='suspended')audioContext.resume(); },{once:true});
+document.addEventListener('click',()=>{ initAudio(); if(audioContext.state==='suspended')audioContext.resume(); },{once:true});
+</script>
 </body>
 </html>
