@@ -3,692 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WAM 2.0</title>
+<meta name="theme-color" content="#101114">
+<title>Moodswinger — Pattern instrument</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;padding:20px;color:#fff}
-.container{max-width:1400px;margin:0 auto}
-h1{text-align:center;margin-bottom:25px;font-size:clamp(1.3rem,4vw,2.3rem);text-shadow:2px 2px 4px rgba(0,0,0,.5)}
-h2{font-size:1.1rem}
-.panel{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
-.control-group{margin-bottom:18px}
-label{display:block;margin-bottom:8px;font-weight:600;font-size:14px}
-input[type=range]{width:100%;height:8px;border-radius:5px;background:rgba(255,255,255,.2);outline:none;-webkit-appearance:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#4CAF50;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.3)}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:#4CAF50;cursor:pointer}
-input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.25);color:#fff;font-size:14px}
-.value-display{display:inline-block;margin-left:8px;padding:3px 10px;background:rgba(76,175,80,.3);border-radius:5px;font-weight:bold;font-size:13px}
-button{padding:12px 22px;border:0;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:.25s;margin:4px;color:#fff}
-button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);box-shadow:0 4px 15px rgba(102,126,234,.4)}
-.btn-success{background:linear-gradient(135deg,#4CAF50,#45a049)}
-.btn-stop{background:linear-gradient(135deg,#f44336,#d32f2f)}
-.btn-secondary{background:linear-gradient(135deg,#f093fb,#f5576c)}
-.btn-ghost{background:rgba(255,255,255,.12)}
-button:not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.1)}
-select{width:100%;padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:14px;cursor:pointer}
-select option{background:#2a5298}
-.status{text-align:center;padding:12px;background:rgba(0,0,0,.22);border-radius:8px;margin-top:12px;font-size:13px;word-break:break-word}
-.toggle-btn{padding:8px 16px;font-size:14px}
-.toggle-btn.active{background:linear-gradient(135deg,#4CAF50,#45a049)}
-.toggle-btn.inactive{background:rgba(255,255,255,.12)}
-.progress-bar{width:100%;height:10px;background:rgba(255,255,255,.2);border-radius:5px;margin-top:12px;overflow:hidden;cursor:pointer}
-.progress-fill{height:100%;background:linear-gradient(90deg,#4CAF50,#8BC34A);width:0%}
-.time-display{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;opacity:.85}
-.big-open{width:100%;padding:22px;font-size:17px;background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.4);border-radius:12px;cursor:pointer}
-.big-open:hover{background:rgba(255,255,255,.2);border-color:#8BC34A}
-
-/* ===== MODAL BROWSER SERVER ===== */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:linear-gradient(160deg,#22315c,#16233f);border:1px solid rgba(255,255,255,.15);border-radius:16px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
-.modal-head{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.modal-head h3{flex:1;font-size:1.1rem;min-width:160px}
-.modal-close{background:rgba(255,255,255,.15);padding:8px 14px;margin:0;font-size:16px}
-.modal-tools{padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08)}
-.modal-tools input[type=text]{flex:1;min-width:140px}
-.breadcrumb{padding:10px 20px;font-size:13px;background:rgba(0,0,0,.25);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.breadcrumb a{color:#8BC34A;cursor:pointer;text-decoration:none}
-.breadcrumb a:hover{text-decoration:underline}
-.file-list{overflow-y:auto;flex:1;padding:8px 12px;min-height:180px}
-.file-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:4px;background:rgba(255,255,255,.04)}
-.file-item:hover{background:rgba(139,195,74,.22);transform:translateX(4px)}
-.file-item.playing{background:rgba(76,175,80,.3);border-left:4px solid #8BC34A}
-.file-icon{font-size:22px;flex-shrink:0}
-.file-info{flex:1;min-width:0}
-.file-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-meta{font-size:11px;opacity:.65;margin-top:2px}
-.file-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.15);flex-shrink:0}
-.empty-msg{text-align:center;padding:30px 20px;opacity:.8;font-size:14px;line-height:1.7}
-.spinner{width:34px;height:34px;border:4px solid rgba(255,255,255,.2);border-top-color:#8BC34A;border-radius:50%;animation:spin .8s linear infinite;margin:24px auto}
-@keyframes spin{to{transform:rotate(360deg)}}
-.hint{font-size:12px;opacity:.7;line-height:1.6;margin-top:10px}
-code{background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;font-size:12px}
-@media(max-width:768px){
-body{padding:12px}
-.grid{grid-template-columns:1fr}
-button{width:100%;margin:5px 0}
-.modal-overlay{padding:0}
-.modal{max-width:100%;max-height:100vh;height:100%;border-radius:0}
-.modal-tools button{width:auto}
-.modal-head button{width:auto}
-}
+:root{color-scheme:dark;--bg:#101114;--panel:#1a1b20;--line:#34353d;--muted:#a1a1ab;--lime:#d8ff3e;--cyan:#53e0d0;--pink:#ff648d;--orange:#ffb84d;--radius:18px}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#37392b 0,transparent 45%),var(--bg);color:#f7f6f1;font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;padding:26px}button,select,input{font:inherit}button{color:inherit;cursor:pointer}.app{max-width:1220px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}.brand{display:flex;gap:14px;align-items:center}.logo{height:48px;width:48px;border-radius:15px;background:var(--lime);color:#151710;display:grid;place-items:center;font-size:25px;box-shadow:0 0 32px #d8ff3e33}.eyebrow,.tag{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:750}.brand h1{font-size:clamp(22px,4vw,32px);line-height:1;margin:4px 0 0;letter-spacing:-.05em}.top-right{display:flex;align-items:center;gap:10px}.live{color:var(--lime);font-size:12px;font-weight:800;letter-spacing:.12em}.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lime);margin-right:8px;box-shadow:0 0 12px var(--lime)}.card{background:linear-gradient(145deg,#202126,#18191e);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:0 12px 35px #0002}.hero{padding:24px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}.section-head h2{margin:0;font-size:16px;letter-spacing:-.02em}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}.tag{border:1px solid var(--line);border-radius:100px;padding:5px 9px;white-space:nowrap}.transport{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}.tempo{display:flex;align-items:center;gap:17px}.bpm{font-size:36px;font-weight:850;letter-spacing:-.07em;min-width:94px}.bpm small{font-size:12px;letter-spacing:.05em;color:var(--muted);margin-left:5px}.slider-wrap{flex:1;max-width:500px}.slider-wrap label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:8px}input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--line);border-radius:11px;padding:10px 14px;background:#28292f;font-weight:750;transition:.15s}.btn:hover{transform:translateY(-1px);border-color:#686970}.btn.primary{background:var(--lime);color:#171910;border-color:var(--lime)}.btn.playing{background:var(--pink);border-color:var(--pink);color:#190d12}.btn.small{font-size:12px;padding:7px 10px}.transport-hint{margin:13px 0 0;color:var(--muted);font-size:11px}.main-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,.8fr);gap:16px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}.control label{font-size:11px;color:var(--muted);display:block;margin-bottom:7px}.control select{width:100%;background:#25262c;border:1px solid #41424a;border-radius:10px;padding:10px;color:#fff;outline:none}.control select:focus{border-color:var(--lime)}.pitches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pad{min-height:92px;border:1px solid #3a3b42;border-radius:14px;background:linear-gradient(145deg,#292a30,#202126);text-align:left;padding:11px;position:relative;overflow:hidden;transition:.13s;touch-action:manipulation}.pad:hover{border-color:#8f916f;transform:translateY(-2px)}.pad.active{background:linear-gradient(145deg,#40462b,#262b20);border-color:var(--lime);box-shadow:inset 0 0 25px #d8ff3e15,0 0 15px #d8ff3e12}.pad.sounding{background:var(--lime);color:#171910;border-color:var(--lime);transform:scale(.97)}.pad .key{position:absolute;right:9px;top:8px;color:#d7d5cd;background:#ffffff12;border:1px solid #ffffff12;border-radius:6px;padding:1px 5px;font:700 11px ui-monospace,monospace}.pad.sounding .key{color:#171910;background:#00000013}.pad .note{font-size:19px;font-weight:850;display:block;letter-spacing:-.04em}.pad .freq{font-size:10px;color:var(--muted);display:block;margin-top:3px}.pad.sounding .freq{color:#333}.pad .pad-index{position:absolute;bottom:8px;right:10px;font-size:9px;color:#777}.pad-tip{font-size:11px;color:var(--muted);margin:13px 0 0}.keyboard{color:#f5f4ed}.steps{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:6px}.step{aspect-ratio:1;border:1px solid #42434a;border-radius:7px;background:#292a30;min-width:0;padding:0;position:relative}.step:nth-child(4n+1){margin-left:4px}.step.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px #53e0d033}.step.current{outline:2px solid var(--lime);outline-offset:2px}.step.on.current{background:var(--lime);border-color:var(--lime)}.step-num{font-size:9px;color:#777;text-align:center;margin-top:5px}.fill-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.fill.active{border-color:var(--orange);color:var(--orange)}.sequence-note{color:var(--muted);font-size:11px;margin-top:12px}.toggle-row{display:flex;gap:8px;flex-wrap:wrap}.toggle.active{border-color:var(--cyan);color:var(--cyan);background:#53e0d010}.fx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.fx{border:1px solid var(--line);background:#202126;border-radius:13px;padding:13px}.fx-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:750}.fx input{margin:7px 0}.fx small{color:var(--muted);font-size:10px}.routing{display:flex;align-items:center;flex-wrap:wrap;gap:7px;font-size:11px;color:#ddd}.node{border:1px solid #4a4b52;background:#27282e;border-radius:8px;padding:6px 9px}.arrow{color:var(--lime)}.note-box{border-left:2px solid var(--lime);padding:2px 0 2px 12px;color:#b9b8c0;font-size:11px;line-height:1.6;margin-top:13px}.footer{color:#74747d;text-align:center;font-size:10px;padding:6px 0 20px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:850px){body{padding:16px}.main-grid{grid-template-columns:1fr}.transport{grid-template-columns:1fr}.actions{justify-content:flex-start}.fx-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){body{padding:10px}.card{padding:15px;border-radius:15px}.hero{padding:17px}.top{align-items:flex-start}.top-right{padding-top:8px}.live{font-size:10px}.bpm{font-size:31px;min-width:80px}.tempo{gap:10px}.pitches{gap:7px}.pad{min-height:76px;padding:8px}.pad .note{font-size:16px}.steps{gap:4px}.step:nth-child(4n+1){margin-left:2px}.step-num{font-size:8px}.fx-grid{grid-template-columns:1fr}.controls{gap:9px}.fill-row{gap:5px}.btn.small{padding:7px 8px}}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>🎛️ WAM 2.0 — Server MP3 Browser + FX</h1>
-
-<div class="grid">
-<!-- ============ PLAYER + BROWSER SERVER ============ -->
-<div class="panel" style="grid-column:1/-1">
-<h2 style="margin-bottom:15px">📂 Libreria Audio sul Server</h2>
-<button class="big-open" id="openBrowserBtn">
-  📁 Clicca per selezionare un file audio (MP3, WAV, OGG, etc.)
-</button>
-
-<div class="control-group" style="margin-top:16px">
-  <label>Cartella sul server:</label>
-  <input type="text" id="serverFolder" value="./" placeholder="es. mp3/  oppure audio/  oppure /media/musica/">
-  <div class="hint">Percorso relativo alla pagina o assoluto. Deve contenere i file audio ed essere raggiungibile via HTTP.</div>
-</div>
-
-<div style="margin-top:14px">
-  <button id="playFileBtn" class="btn-success" disabled>▶️ Play</button>
-  <button id="pauseFileBtn" class="btn-secondary" disabled>⏸️ Pausa</button>
-  <button id="stopFileBtn" class="btn-stop" disabled>⏹️ Stop</button>
-  <button id="loopBtn" class="btn-ghost toggle-btn inactive">🔁 Loop: OFF</button>
-</div>
-
-<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="time-display"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
-<div class="status" id="fileStatus">Nessun file caricato — apri la libreria per scegliere un brano.</div>
-</div>
-
-<!-- ============ EFFETTI ============ -->
-<div class="panel">
-<h2 style="margin-bottom:15px">🎵 BPM Globale</h2>
-<div class="control-group">
-<label>Tempo (BPM):<span class="value-display" id="bpmValue">120</span></label>
-<input type="range" id="bpmSlider" min="40" max="240" value="120" step="1">
-</div>
-<button id="bpmSyncBtn" class="btn-ghost toggle-btn inactive">Sync Delay al BPM: OFF</button>
-<div class="hint">Con Sync attivo il delay segue il tempo (1/4 di battuta).</div>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🔊 Filtro</h2>
-<div class="control-group">
-<label>Frequenza di Taglio:<span class="value-display" id="filterFreqValue">20000 Hz</span></label>
-<input type="range" id="filterFreq" min="20" max="20000" value="20000" step="10">
-</div>
-<div class="control-group">
-<label>Risonanza (Q):<span class="value-display" id="filterQValue">1.0</span></label>
-<input type="range" id="filterQ" min="0.1" max="20" value="1" step="0.1">
-</div>
-<div class="control-group">
-<label>Tipo Filtro:</label>
-<select id="filterType">
-<option value="lowpass">Low Pass</option><option value="highpass">High Pass</option>
-<option value="bandpass">Band Pass</option><option value="notch">Notch</option>
-</select>
-</div>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🔁 Delay</h2>
-<div class="control-group">
-<label>Tempo Delay:<span class="value-display" id="delayTimeValue">0.30 s</span></label>
-<input type="range" id="delayTime" min="0.01" max="2" value="0.3" step="0.01">
-</div>
-<div class="control-group">
-<label>Feedback:<span class="value-display" id="delayFeedbackValue">0.40</span></label>
-<input type="range" id="delayFeedback" min="0" max="0.9" value="0.4" step="0.01">
-</div>
-<div class="control-group">
-<label>Mix:<span class="value-display" id="delayMixValue">0.30</span></label>
-<input type="range" id="delayMix" min="0" max="1" value="0.3" step="0.01">
-</div>
-<button id="delayToggle" class="btn-secondary toggle-btn active">Delay: ON</button>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🌊 Chorus</h2>
-<div class="control-group">
-<label>Profondità:<span class="value-display" id="chorusDepthValue">0.0020</span></label>
-<input type="range" id="chorusDepth" min="0" max="0.01" value="0.002" step="0.0001">
-</div>
-<div class="control-group">
-<label>Velocità:<span class="value-display" id="chorusRateValue">1.5 Hz</span></label>
-<input type="range" id="chorusRate" min="0.1" max="10" value="1.5" step="0.1">
-</div>
-<div class="control-group">
-<label>Mix:<span class="value-display" id="chorusMixValue">0.50</span></label>
-<input type="range" id="chorusMix" min="0" max="1" value="0.5" step="0.01">
-</div>
-<button id="chorusToggle" class="btn-secondary toggle-btn inactive">Chorus: OFF</button>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">💥 Bitcrusher</h2>
-<div class="control-group">
-<label>Bits:<span class="value-display" id="bitcrusherBitsValue">16</span></label>
-<input type="range" id="bitcrusherBits" min="1" max="16" value="16" step="1">
-</div>
-<div class="control-group">
-<label>Sample Rate Reduction:<span class="value-display" id="bitcrusherSampleRateValue">1.00</span></label>
-<input type="range" id="bitcrusherSampleRate" min="0.05" max="1" value="1" step="0.01">
-</div>
-<div class="control-group">
-<label>Mix:<span class="value-display" id="bitcrusherMixValue">0.50</span></label>
-<input type="range" id="bitcrusherMix" min="0" max="1" value="0.5" step="0.01">
-</div>
-<button id="bitcrusherToggle" class="btn-secondary toggle-btn inactive">Bitcrusher: OFF</button>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🎼 Legato (Fade)</h2>
-<div class="control-group">
-<label>Glide / Fade Time:<span class="value-display" id="legatoGlideValue">0.10 s</span></label>
-<input type="range" id="legatoGlide" min="0" max="2" value="0.1" step="0.01">
-</div>
-<button id="legatoToggle" class="btn-secondary toggle-btn inactive">Legato: OFF</button>
-<div class="hint">Su un file audio il legato applica una dissolvenza morbida su play/stop/cambio traccia.</div>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🎹 Preset Scala</h2>
-<div class="control-group">
-<label>Seleziona Scala:</label>
-<select id="scalePreset">
-<option value="chromatic">Cromatica</option><option value="major">Maggiore</option>
-<option value="minor">Minore Naturale</option><option value="pentatonic">Pentatonica Maggiore</option>
-<option value="pentatonicMinor">Pentatonica Minore</option><option value="blues">Blues</option>
-<option value="dorian">Dorica</option><option value="phrygian">Frigia</option>
-<option value="lydian">Lidia</option><option value="mixolydian">Mixolidia</option>
-<option value="locrian">Locria</option><option value="harmonicMinor">Minore Armonica</option>
-<option value="melodicMinor">Minore Melodica</option>
-</select>
-</div>
-<div class="control-group">
-<label>Nota Fondamentale:<span class="value-display" id="rootNoteValue">C4</span></label>
-<select id="rootNote">
-<option value="60">C4</option><option value="61">C#4</option><option value="62">D4</option>
-<option value="63">D#4</option><option value="64">E4</option><option value="65">F4</option>
-<option value="66">F#4</option><option value="67">G4</option><option value="68">G#4</option>
-<option value="69">A4</option><option value="70">A#4</option><option value="71">B4</option>
-</select>
-</div>
-<div class="hint">Riferimento tonale per usi futuri (nessun synth interno attivo).</div>
-</div>
-
-<div class="panel">
-<h2 style="margin-bottom:15px">🔈 Volume Master</h2>
-<div class="control-group">
-<label>Volume:<span class="value-display" id="masterVolumeValue">0.70</span></label>
-<input type="range" id="masterVolume" min="0" max="1" value="0.7" step="0.01">
-</div>
-<button id="resetFxBtn" class="btn-ghost">↺ Reset Effetti</button>
-</div>
-</div>
-</div>
-
-<!-- ============ MODAL: BROWSER FILE SERVER ============ -->
-<div class="modal-overlay" id="browserModal">
-<div class="modal">
-<div class="modal-head">
-<h3>📂 Libreria Server</h3>
-<button class="btn-ghost" id="refreshBtn" style="padding:8px 14px;margin:0">🔄</button>
-<button class="modal-close" id="closeBrowserBtn">✕</button>
-</div>
-<div class="modal-tools">
-<input type="text" id="searchBox" placeholder="🔍 Cerca file…">
-<button class="btn-ghost" id="localFileBtn" style="margin:0;padding:10px 14px;font-size:13px">💻 File locale</button>
-<input type="file" id="localFileInput" accept="audio/*" style="display:none">
-</div>
-<div class="breadcrumb" id="breadcrumb"></div>
-<div class="file-list" id="fileList"></div>
-</div>
-</div>
-
+<main class="app">
+  <header class="top">
+    <div class="brand"><div class="logo" aria-hidden="true">〰</div><div><div class="eyebrow">strumento a corde — playground sonoro</div><h1>Moodswinger <span style="color:var(--lime)">/</span> 16</h1></div></div>
+    <div class="top-right"><span class="live">AUDIO LIVE</span></div>
+  </header>
+  <section class="card hero" aria-label="Trasporto e tempo">
+    <div class="transport">
+      <div class="tempo"><div class="bpm"><span id="bpmReadout">120</span><small>BPM</small></div><div class="slider-wrap"><label for="bpm"><span>TEMPO GLOBALE</span><span>40 — 240</span></label><input id="bpm" type="range" min="40" max="240" value="120" aria-label="Tempo globale in BPM"></div></div>
+      <div class="actions"><button class="btn primary" id="playBtn" type="button">▶ Avvia pattern</button><button class="btn" id="stopBtn" type="button">■ Stop</button></div>
+    </div>
+    <p class="transport-hint">Il BPM regola in tempo reale la durata degli step: tutti i fill restano sincronizzati, anche mentre cambi velocità.</p>
+  </section>
+  <div class="main-grid">
+    <section class="card" aria-labelledby="padsTitle">
+      <div class="section-head"><div><h2 id="padsTitle">01 / Touch the strings</h2><p>16 celle di pitch · clicca o suona con la tastiera</p></div><span class="tag" id="scaleTag">C · Pentatonica</span></div>
+      <div class="controls" style="margin-bottom:16px">
+        <div class="control"><label for="scale">PRESET DI SCALA</label><select id="scale"><option value="pentatonic">Pentatonica maggiore</option><option value="pentatonicMinor">Pentatonica minore</option><option value="major">Maggiore / Ionica</option><option value="minor">Minore naturale / Eolia</option><option value="dorian">Dorica</option><option value="phrygian">Frigia</option><option value="lydian">Lidia</option><option value="mixolydian">Misolidia</option><option value="locrian">Locria</option><option value="blues">Blues</option><option value="harmonicMinor">Minore armonica</option><option value="chromatic">Cromatica</option></select></div>
+        <div class="control"><label for="root">TONICA</label><select id="root"><option value="60">C</option><option value="61">C♯</option><option value="62">D</option><option value="63">D♯</option><option value="64">E</option><option value="65">F</option><option value="66">F♯</option><option value="67">G</option><option value="68">G♯</option><option value="69">A</option><option value="70">A♯</option><option value="71">B</option></select></div>
+      </div>
+      <div id="pads" class="pitches" role="group" aria-label="Sedici pad melodici"></div>
+      <p class="pad-tip">Tasti live: <span class="keyboard">A W S E D F T G Y H U J K O L P</span> · seleziona un pad e premi play per sequenziarlo.</p>
+    </section>
+    <section class="card" aria-labelledby="patternTitle">
+      <div class="section-head"><div><h2 id="patternTitle">02 / Pattern sequencer</h2><p>16 step · sequenzia il pitch selezionato</p></div><span class="tag" id="selectedNote">C4</span></div>
+      <div class="steps" id="steps" role="group" aria-label="Pattern a sedici step"></div>
+      <div class="step-num" style="display:grid;grid-template-columns:repeat(16,1fr);gap:6px" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
+      <div class="section-head" style="margin:20px 0 0"><div><h2>Fill variations</h2><p>Un tocco per caricare il pattern</p></div><span class="tag">5 FILL</span></div>
+      <div class="fill-row" id="fills"><button class="btn small fill" data-fill="straight">01 · Pulse</button><button class="btn small fill" data-fill="offbeat">02 · Offbeat</button><button class="btn small fill" data-fill="shuffle">03 · Shuffle</button><button class="btn small fill" data-fill="build">04 · Build</button><button class="btn small fill" data-fill="sparse">05 · Sparse</button></div>
+      <p class="sequence-note" id="sequenceStatus">Seleziona un fill o attiva gli step manualmente. Il pattern ripete la nota selezionata.</p>
+    </section>
+  </div>
+  <section class="card">
+    <div class="section-head"><div><h2>03 / Performance & routing</h2><p>Controlli espressivi e uscita audio</p></div><span class="tag">WEB AUDIO</span></div>
+    <div class="toggle-row"><button class="btn toggle" id="sustainBtn" type="button" aria-pressed="false">Sustain · OFF</button><button class="btn toggle" id="legatoBtn" type="button" aria-pressed="false">Legato · OFF</button><button class="btn toggle active" id="delayBtn" type="button" aria-pressed="true">Delay · ON</button></div>
+    <div class="note-box"><strong>Sustain</strong> mantiene le note dopo aver rilasciato il tasto (clicca di nuovo il pad per fermarle). <strong>Legato</strong> sovrappone e ammorbidisce l’attacco delle note successive.</div>
+    <div style="margin-top:17px" class="routing" aria-label="Routing audio"><span class="node">16 pad / pattern</span><span class="arrow">→</span><span class="node">Filtro low-pass</span><span class="arrow">→</span><span class="node">Chorus</span><span class="arrow">→</span><span class="node">Flanger</span><span class="arrow">→</span><span class="node">Bitcrusher</span><span class="arrow">→</span><span class="node">Delay</span><span class="arrow">→</span><span class="node">Master / uscita</span></div>
+    <p class="sequence-note">Suggerimento: collega l’uscita del browser a una scheda audio o a un ingresso virtuale (es. loopback), poi instradala nel tuo DAW. Usa cuffie e parti con il volume basso.</p>
+  </section>
+  <section class="card">
+    <div class="section-head"><div><h2>04 / Effetti</h2><p>Modella il suono mentre suoni</p></div><button class="btn small" id="resetFx" type="button">↺ Reset</button></div>
+    <div class="fx-grid">
+      <div class="fx"><div class="fx-top"><span>🌊 Chorus</span><button class="btn small toggle" id="chorusBtn" type="button" aria-pressed="false">OFF</button></div><label class="sr-only" for="chorusMix">Mix chorus</label><input id="chorusMix" type="range" min="0" max="1" step=".01" value=".35"><small>Mix <span id="chorusValue">35%</span> · larghezza stereo</small></div>
+      <div class="fx"><div class="fx-top"><span>〰 Flanger</span><button class="btn small toggle" id="flangerBtn" type="button" aria-pressed="false">OFF</button></div><label class="sr-only" for="flangerMix">Mix flanger</label><input id="flangerMix" type="range" min="0" max="1" step=".01" value=".25"><small>Mix <span id="flangerValue">25%</span> · movimento</small></div>
+      <div class="fx"><div class="fx-top"><span>▦ Bitcrusher</span><button class="btn small toggle" id="crushBtn" type="button" aria-pressed="false">OFF</button></div><label class="sr-only" for="crushMix">Mix bitcrusher</label><input id="crushMix" type="range" min="0" max="1" step=".01" value=".35"><small>Mix <span id="crushValue">35%</span> · lo-fi</small></div>
+    </div>
+  </section>
+  <footer class="footer">Audio generato in tempo reale nel browser · premi un pad o un tasto per attivare l’audio</footer>
+</main>
 <script>
-/* =======================================================================
-CONFIGURAZIONE SERVER
-Il browser prova in ordine:
-1) list.php?dir=... (JSON consigliato - vedi file list.php)
-2) files.json / index.json (lista statica)
-3) directory listing HTML (Apache "Options +Indexes" / nginx autoindex)
-======================================================================= */
-const SERVER = {
-root: './',
-endpoints: ['list.php', 'files.json', 'index.json'],
-exts: ['mp3','wav','ogg','m4a','aac','flac','opus','webm']
-};
-
-/* ---------- STATO AUDIO ---------- */
-let audioContext, filter, dryGain, masterGain;
-let delayNode, delayFeedback, delayMix;
-let chorusNode, chorusLFO, chorusDepthGain, chorusMixGain;
-let bitcrusherNode, bcMixGain;
-let bcBits = 16, bcRate = 1;
-
-let currentBPM = 120, bpmSync = false;
-let chorusEnabled = false, bitcrusherEnabled = false, delayEnabled = true;
-let legatoEnabled = false, legatoGlide = 0.1, loopEnabled = false;
-
-let audioBuffer = null, fileSource = null;
-let isFilePlaying = false, isFilePaused = false;
-let startTime = 0, pauseTime = 0, currentURL = '', currentName = '';
-let rafId = null;
-
-/* ---------- INIT AUDIO GRAPH ---------- */
-function initAudio(){
-if(audioContext) return;
-audioContext = new (window.AudioContext||window.webkitAudioContext)();
-
-masterGain = audioContext.createGain(); masterGain.gain.value = 0.7;
-masterGain.connect(audioContext.destination);
-
-dryGain = audioContext.createGain(); dryGain.gain.value = 1;
-dryGain.connect(masterGain);
-
-filter = audioContext.createBiquadFilter();
-filter.type='lowpass'; filter.frequency.value=20000; filter.Q.value=1;
-filter.connect(dryGain);
-
-// Delay
-delayNode = audioContext.createDelay(2.0); delayNode.delayTime.value=0.3;
-delayFeedback = audioContext.createGain(); delayFeedback.gain.value=0.4;
-delayMix = audioContext.createGain(); delayMix.gain.value=0.3;
-filter.connect(delayNode);
-delayNode.connect(delayFeedback); delayFeedback.connect(delayNode);
-delayNode.connect(delayMix); delayMix.connect(masterGain);
-
-// Chorus
-chorusNode = audioContext.createDelay(0.05); chorusNode.delayTime.value=0.015;
-chorusLFO = audioContext.createOscillator(); chorusLFO.frequency.value=1.5;
-chorusDepthGain = audioContext.createGain(); chorusDepthGain.gain.value=0.002;
-chorusMixGain = audioContext.createGain(); chorusMixGain.gain.value=0;
-chorusLFO.connect(chorusDepthGain); chorusDepthGain.connect(chorusNode.delayTime);
-chorusLFO.start();
-filter.connect(chorusNode); chorusNode.connect(chorusMixGain); chorusMixGain.connect(masterGain);
-
-// Bitcrusher
-bitcrusherNode = audioContext.createScriptProcessor(4096,2,2);
-let phL=0,phR=0,lastL=0,lastR=0;
-bitcrusherNode.onaudioprocess = e=>{
-const inL=e.inputBuffer.getChannelData(0);
-const inR=e.inputBuffer.numberOfChannels>1?e.inputBuffer.getChannelData(1):inL;
-const outL=e.outputBuffer.getChannelData(0);
-const outR=e.outputBuffer.getChannelData(1);
-const step=Math.pow(0.5,bcBits);
-for(let i=0;i<inL.length;i++){
-phL+=bcRate; if(phL>=1){phL-=1; lastL=Math.round(inL[i]/step)*step;}
-phR+=bcRate; if(phR>=1){phR-=1; lastR=Math.round(inR[i]/step)*step;}
-outL[i]=lastL; outR[i]=lastR;
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id), notes=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+const scales={pentatonic:[0,2,4,7,9],pentatonicMinor:[0,3,5,7,10],major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],dorian:[0,2,3,5,7,9,10],phrygian:[0,1,3,5,7,8,10],lydian:[0,2,4,6,7,9,11],mixolydian:[0,2,4,5,7,9,10],locrian:[0,1,3,5,6,8,10],blues:[0,3,5,6,7,10],harmonicMinor:[0,2,3,5,7,8,11],chromatic:[0,1,2,3,4,5,6,7,8,9,10,11]};
+const scaleLabels={pentatonic:'Pentatonica',pentatonicMinor:'Pent. minore',major:'Maggiore',minor:'Minore naturale',dorian:'Dorica',phrygian:'Frigia',lydian:'Lidia',mixolydian:'Misolidia',locrian:'Locria',blues:'Blues',harmonicMinor:'Minore armonica',chromatic:'Cromatica'};
+const keyMap=['a','w','s','e','d','f','t','g','y','h','u','j','k','o','l','p'];let audio=null,master=null,fx={},voices=new Map(),sustain=false,legato=false,delayOn=true,playing=false,stepIndex=-1,timer=null,selected=0,bpm=120,pattern=Array(16).fill(false),currentFill='';
+function noteData(i){const root=+$('root').value, degrees=scales[$('scale').value];let midi=root;for(let n=0;n<=i;n++)midi=root+degrees[n%degrees.length]+12*Math.floor(n/degrees.length);return midi}
+function noteName(midi){return notes[midi%12]+(Math.floor(midi/12)-1)}
+function renderPads(){const root=+$('root').value; $('pads').innerHTML=keyMap.map((key,i)=>{const midi=noteData(i),active=i===selected;return `<button class="pad${active?' active':''}" data-pad="${i}" type="button" aria-label="Pad ${i+1}, nota ${noteName(midi)}, tasto ${key}"><span class="key">${key.toUpperCase()}</span><span class="note">${noteName(midi)}</span><span class="freq">${Math.round(440*Math.pow(2,(midi-69)/12))} Hz</span><span class="pad-index">${String(i+1).padStart(2,'0')}</span></button>`}).join('');$('pads').querySelectorAll('.pad').forEach(el=>{el.addEventListener('pointerdown',e=>{e.preventDefault();const i=+el.dataset.pad;selectPad(i);trigger(i)});el.addEventListener('pointerup',()=>release(iFrom(el)));el.addEventListener('pointercancel',()=>release(iFrom(el)));el.addEventListener('pointerleave',e=>{if(e.buttons)release(iFrom(el))})}); updateScaleLabel()}
+function iFrom(el){return +el.dataset.pad}
+function updateScaleLabel(){$('scaleTag').textContent=notes[+$('root').value]+' · '+scaleLabels[$('scale').value]}
+function renderSteps(){$('steps').innerHTML=pattern.map((on,i)=>`<button class="step${on?' on':''}" data-step="${i}" type="button" aria-label="Step ${i+1}${on?', attivo':''}" aria-pressed="${on}"></button>`).join('');$('steps').querySelectorAll('.step').forEach(el=>el.onclick=()=>{const i=+el.dataset.step;pattern[i]=!pattern[i];currentFill='';document.querySelectorAll('.fill').forEach(b=>b.classList.remove('active'));renderSteps()})}
+function audioInit(){if(audio)return;audio=new(window.AudioContext||window.webkitAudioContext)();master=audio.createGain();master.gain.value=.55;const output=audio.createDynamicsCompressor();output.threshold.value=-16;output.ratio.value=3;master.connect(output);output.connect(audio.destination);
+const dry=audio.createGain();dry.gain.value=.8;dry.connect(master);
+const chorusDelay=audio.createDelay(.05),chorusLfo=audio.createOscillator(),chorusDepth=audio.createGain(),chorusWet=audio.createGain();chorusDelay.delayTime.value=.018;chorusLfo.frequency.value=.8;chorusDepth.gain.value=.003;chorusLfo.connect(chorusDepth);chorusDepth.connect(chorusDelay.delayTime);chorusLfo.start();chorusDelay.connect(chorusWet);chorusWet.connect(master);fx.chorus={wet:chorusWet,delay:chorusDelay};
+const flangeDelay=audio.createDelay(.02),flangeLfo=audio.createOscillator(),flangeDepth=audio.createGain(),flangeWet=audio.createGain(),flangeFeedback=audio.createGain();flangeDelay.delayTime.value=.004;flangeLfo.frequency.value=.22;flangeDepth.gain.value=.003;flangeLfo.connect(flangeDepth);flangeDepth.connect(flangeDelay.delayTime);flangeLfo.start();flangeFeedback.gain.value=.2;flangeDelay.connect(flangeFeedback);flangeFeedback.connect(flangeDelay);flangeDelay.connect(flangeWet);flangeWet.connect(master);fx.flanger={wet:flangeWet,delay:flangeDelay,feedback:flangeFeedback};
+const crush=audio.createScriptProcessor(2048,1,1);let last=0,phase=0;crush.onaudioprocess=e=>{const input=e.inputBuffer.getChannelData(0),out=e.outputBuffer.getChannelData(0);for(let i=0;i<input.length;i++){phase+=.35;if(phase>=1){phase-=1;last=Math.round(input[i]*24)/24}out[i]=last}};const crushWet=audio.createGain();crushWet.gain.value=0;crush.connect(crushWet);crushWet.connect(master);fx.crush={wet:crushWet,node:crush};
+const delay=audio.createDelay(2),fb=audio.createGain(),dw=audio.createGain();delay.delayTime.value=.3;fb.gain.value=.28;dw.gain.value=.18;delay.connect(fb);fb.connect(delay);delay.connect(dw);dw.connect(master);fx.delay={wet:dw,node:delay};fx.input=dry;
 }
-};
-bcMixGain = audioContext.createGain(); bcMixGain.gain.value=0;
-filter.connect(bitcrusherNode); bitcrusherNode.connect(bcMixGain); bcMixGain.connect(masterGain);
-}
-
-/* ---------- UTILS ---------- */
-const $ = id => document.getElementById(id);
-function formatTime(s){ if(!isFinite(s)||s<0)s=0; const m=Math.floor(s/60); return m+':'+String(Math.floor(s%60)).padStart(2,'0'); }
-function fmtSize(b){ if(!b&&b!==0) return ''; if(b<1024)return b+' B'; if(b<1048576)return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-function isAudio(name){ return SERVER.exts.includes(name.split('.').pop().toLowerCase().split('?')[0]); }
-function joinPath(base,name){ return base.replace(/\/+$/,'')+'/'+name.replace(/^\/+/,''); }
-function iconFor(name){
-const e=name.split('.').pop().toLowerCase();
-return {mp3:'🎵',wav:'🎚️',ogg:'🎶',m4a:'🎧',aac:'🎧',flac:'💎',opus:'🎼',webm:'🎬'}[e]||'🎵';
-}
-
-/* =======================================================================
-BROWSER FILE SERVER
-======================================================================= */
-let currentDir = SERVER.root;
-let allEntries = [];
-let dirHistory = [];
-
-function openBrowser(){
-$('browserModal').classList.add('open');
-SERVER.root = $('serverFolder').value.trim() || './';
-currentDir = SERVER.root; dirHistory=[];
-loadDirectory(currentDir);
-}
-function closeBrowser(){ $('browserModal').classList.remove('open'); }
-
-async function loadDirectory(dir){
-currentDir = dir;
-renderBreadcrumb();
-$('fileList').innerHTML = '<div class="spinner"></div>';
-allEntries = [];
-
-if(location.protocol === 'file:'){
-showBrowserError('⚠️ Pagina aperta come <code>file://</code>.<br>Il browser server funziona solo via HTTP.<br>Avvia un server locale, es:<br><code>python -m http.server 8000</code><br>poi apri <code>http://localhost:8000/185.html</code>');
-return;
-}
-
-// 1) endpoint JSON (list.php o files.json)
-for(const ep of SERVER.endpoints){
-try{
-const url = joinPath(SERVER.root, ep) + '?dir=' + encodeURIComponent(dir);
-const res = await fetch(url, {cache:'no-store'});
-if(!res.ok) continue;
-const ct = res.headers.get('content-type')||'';
-if(!ct.includes('json') && !ep.endsWith('.json')) {
-const txt = await res.text();
-try{ const j=JSON.parse(txt); if(parseJsonList(j,dir)) return; }catch(_){ continue; }
-} else {
-const j = await res.json();
-if(parseJsonList(j,dir)) return;
-}
-}catch(_){}
-}
-
-// 2) directory listing HTML (autoindex)
-try{
-const res = await fetch(dir, {cache:'no-store'});
-if(res.ok){
-const html = await res.text();
-if(parseAutoIndex(html,dir)) return;
-}
-}catch(_){}
-
-showBrowserError('❌ Impossibile leggere la cartella <code>'+dir+'</code>.<br><br>'+
-'<b>Soluzioni:</b><br>'+
-'1. Carica <code>list.php</code> dentro la cartella (vedi file fornito).<br>'+
-'2. Oppure crea <code>files.json</code>: <code>{"files":["a.mp3","b.mp3"]}</code><br>'+
-'3. Oppure abilita il directory listing:<br>Apache: <code>Options +Indexes</code> — nginx: <code>autoindex on;</code><br>'+
-'4. Python: <code>python -m http.server</code> (listing attivo di default).');
-}
-
-function parseJsonList(j,dir){
-let items = Array.isArray(j) ? j : (j.files || j.items || j.entries || null);
-if(!Array.isArray(items) || !items.length) return false;
-allEntries = items.map(it=>{
-if(typeof it === 'string') return {name:it.split('/').pop(), path: it.startsWith('http')||it.startsWith('/') ? it : joinPath(dir,it), type:'file', size:null};
-return {
-name: it.name || it.file || '',
-path: it.url || it.path || joinPath(dir, it.name||it.file||''),
-type: (it.type==='dir'||it.dir) ? 'dir' : 'file',
-size: it.size ?? null,
-duration: it.duration ?? null
-};
-}).filter(e=>e.name && (e.type==='dir' || isAudio(e.name)));
-if(!allEntries.length) return false;
-renderList(); return true;
-}
-
-function parseAutoIndex(html,dir){
-const doc = new DOMParser().parseFromString(html,'text/html');
-const links = [...doc.querySelectorAll('a[href]')];
-const out = [];
-links.forEach(a=>{
-let href = a.getAttribute('href');
-if(!href || href.startsWith('?') || href.startsWith('#') || href.startsWith('mailto:')) return;
-if(href==='../' || href==='..' || href==='/') return;
-let name = decodeURIComponent(href.replace(/\/$/,'').split('/').pop());
-if(!name || name.startsWith('.')) return;
-if(/^\//.test(href) && !href.startsWith(dir)) return; // link fuori cartella
-const isDir = href.endsWith('/');
-if(!isDir && !isAudio(name)) return;
-if(out.some(o=>o.name===name)) return;
-// prova a leggere la dimensione dal testo della riga (autoindex Apache/Python)
-let size=null;
-const row = a.parentElement ? a.parentElement.textContent : '';
-const m = row.match(/(\d+(?:\.\d+)?)\s*(K|M|G|KiB|MiB)?\s*$/i);
-out.push({name, path: new URL(href, new URL(dir, location.href)).href, type:isDir?'dir':'file', size});
-});
-if(!out.length) return false;
-allEntries = out;
-renderList(); return true;
-}
-
-function showBrowserError(msg){
-$('fileList').innerHTML = '<div class="empty-msg">'+msg+'</div>';
-}
-
-function renderBreadcrumb(){
-const parts = currentDir.split('/').filter(Boolean);
-let html = '<span>📁</span>', acc='';
-parts.forEach((p,i)=>{
-acc += p+'/';
-const target = acc;
-html += '<a data-dir="'+target+'">'+p+'</a>';
-if(i<parts.length-1) html += '<span>/</span>';
-});
-if(dirHistory.length) html += ' <a id="upDir" style="margin-left:auto">⬆️ Su</a>';
-$('breadcrumb').innerHTML = html;
-$('breadcrumb').querySelectorAll('a[data-dir]').forEach(a=>{
-a.onclick = ()=>{ dirHistory=[]; loadDirectory(a.dataset.dir); };
-});
-const up = $('upDir');
-if(up) up.onclick = ()=>{ const prev=dirHistory.pop(); if(prev!==undefined) loadDirectory(prev); };
-}
-
-function renderList(){
-const q = $('searchBox').value.toLowerCase().trim();
-const items = allEntries
-.filter(e=>e.name.toLowerCase().includes(q))
-.sort((a,b)=> (a.type===b.type) ? a.name.localeCompare(b.name) : (a.type==='dir'?-1:1));
-
-if(!items.length){
-$('fileList').innerHTML = '<div class="empty-msg">🔍 Nessun file audio trovato in questa cartella.</div>';
-return;
-}
-$('fileList').innerHTML = items.map((e,i)=>{
-const playing = (e.path===currentURL) ? ' playing':'';
-const meta = e.type==='dir' ? 'Cartella' : [e.size?fmtSize(e.size):'', e.duration?formatTime(e.duration):''].filter(Boolean).join(' • ') || e.name.split('.').pop().toUpperCase();
-return '<div class="file-item'+playing+'" data-i="'+i+'">'+
-'<div class="file-icon">'+(e.type==='dir'?'📁':iconFor(e.name))+'</div>'+
-'<div class="file-info"><div class="file-name">'+e.name+'</div><div class="file-meta">'+meta+'</div></div>'+
-'<div class="file-badge">'+(e.type==='dir'?'APRI':'CARICA')+'</div></div>';
-}).join('');
-
-$('fileList').querySelectorAll('.file-item').forEach(el=>{
-el.onclick = ()=>{
-const e = items[+el.dataset.i];
-if(e.type==='dir'){ dirHistory.push(currentDir); loadDirectory(e.path.endsWith('/')?e.path:e.path+'/'); }
-else loadFromServer(e.path, e.name);
-};
-});
-}
-
-/* ---------- CARICAMENTO DA SERVER ---------- */
-async function loadFromServer(url,name){
-initAudio();
-if(audioContext.state==='suspended') await audioContext.resume();
-stopFile();
-$('fileStatus').textContent = '⏳ Download di "'+name+'" in corso…';
-closeBrowser();
-try{
-const res = await fetch(url);
-if(!res.ok) throw new Error('HTTP '+res.status);
-const buf = await res.arrayBuffer();
-audioBuffer = await audioContext.decodeAudioData(buf);
-currentURL = url; currentName = name;
-$('fileStatus').textContent = '✓ '+name+' — '+audioBuffer.duration.toFixed(1)+'s • '+audioBuffer.numberOfChannels+'ch • '+audioBuffer.sampleRate+'Hz';
-enablePlayer(true);
-playFile();
-}catch(err){
-$('fileStatus').textContent = '❌ Errore caricamento "'+name+'": '+err.message;
-}
-}
-
-/* ---------- CARICAMENTO LOCALE (fallback) ---------- */
-$('localFileBtn').onclick = ()=> $('localFileInput').click();
-$('localFileInput').onchange = async e=>{
-const f = e.target.files[0]; if(!f) return;
-initAudio(); stopFile(); closeBrowser();
-$('fileStatus').textContent = '⏳ Decodifica locale…';
-try{
-audioBuffer = await audioContext.decodeAudioData(await f.arrayBuffer());
-currentURL=''; currentName=f.name;
-$('fileStatus').textContent = '✓ '+f.name+' (locale) — '+audioBuffer.duration.toFixed(1)+'s';
-enablePlayer(true); playFile();
-}catch(err){ $('fileStatus').textContent='❌ File non decodificabile: '+err.message; }
-};
-
-/* ---------- PLAYER ---------- */
-function enablePlayer(on){ ['playFileBtn','pauseFileBtn','stopFileBtn'].forEach(id=>$(id).disabled=!on); }
-
-function fade(param,target,time){
-const now=audioContext.currentTime;
-param.cancelScheduledValues(now);
-param.setValueAtTime(param.value,now);
-param.linearRampToValueAtTime(target,now+Math.max(0.005,time));
-}
-
-function playFile(){
-if(!audioBuffer) return;
-initAudio();
-if(audioContext.state==='suspended') audioContext.resume();
-if(isFilePlaying) return;
-
-const offset = isFilePaused ? pauseTime : 0;
-fileSource = audioContext.createBufferSource();
-fileSource.buffer = audioBuffer;
-fileSource.loop = loopEnabled;
-fileSource.connect(filter);
-
-const g = legatoEnabled ? legatoGlide : 0.01;
-masterGain.gain.cancelScheduledValues(audioContext.currentTime);
-masterGain.gain.setValueAtTime(0.0001,audioContext.currentTime);
-masterGain.gain.linearRampToValueAtTime(parseFloat($('masterVolume').value),audioContext.currentTime+g);
-
-fileSource.start(0, offset);
-startTime = audioContext.currentTime;
-if(!isFilePaused) pauseTime = 0;
-isFilePlaying = true; isFilePaused = false;
-
-fileSource.onended = ()=>{ if(isFilePlaying && !isFilePaused && !loopEnabled){ stopFile(); } };
-$('totalTime').textContent = formatTime(audioBuffer.duration);
-tick();
-}
-
-function pauseFile(){
-if(!isFilePlaying) return;
-pauseTime += audioContext.currentTime - startTime;
-isFilePlaying = false; isFilePaused = true;
-const done = ()=>{ try{fileSource.onended=null;fileSource.stop();}catch(_){} };
-if(legatoEnabled){ fade(masterGain.gain,0.0001,legatoGlide); setTimeout(done,legatoGlide*1000); } else done();
-cancelAnimationFrame(rafId);
-}
-
-function stopFile(){
-cancelAnimationFrame(rafId);
-if(fileSource){ try{fileSource.onended=null;fileSource.stop();}catch(_){} fileSource=null; }
-isFilePlaying=false; isFilePaused=false; pauseTime=0;
-$('progressFill').style.width='0%'; $('currentTime').textContent='0:00';
-if(masterGain && audioContext) masterGain.gain.setValueAtTime(parseFloat($('masterVolume').value),audioContext.currentTime);
-}
-
-function tick(){
-if(!isFilePlaying||!audioBuffer) return;
-let t = audioContext.currentTime - startTime + pauseTime;
-if(loopEnabled) t = t % audioBuffer.duration;
-$('progressFill').style.width = Math.min(t/audioBuffer.duration*100,100)+'%';
-$('currentTime').textContent = formatTime(t);
-rafId = requestAnimationFrame(tick);
-}
-
-$('progressBar').onclick = e=>{
-if(!audioBuffer) return;
-const r = e.currentTarget.getBoundingClientRect();
-const pos = Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)) * audioBuffer.duration;
-const wasPlaying = isFilePlaying;
-if(fileSource){ try{fileSource.onended=null;fileSource.stop();}catch(_){} }
-isFilePlaying=false; isFilePaused=true; pauseTime=pos;
-if(wasPlaying) playFile();
-else { $('progressFill').style.width=(pos/audioBuffer.duration*100)+'%'; $('currentTime').textContent=formatTime(pos); }
-};
-
-/* ---------- EVENTI UI ---------- */
-$('openBrowserBtn').onclick = openBrowser;
-$('closeBrowserBtn').onclick = closeBrowser;
-$('browserModal').onclick = e=>{ if(e.target===$('browserModal')) closeBrowser(); };
-$('refreshBtn').onclick = ()=> loadDirectory(currentDir);
-$('searchBox').oninput = renderList;
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowser(); });
-$('serverFolder').onchange = e=>{ SERVER.root=e.target.value.trim()||'./'; };
-
-$('playFileBtn').onclick = playFile;
-$('pauseFileBtn').onclick = pauseFile;
-$('stopFileBtn').onclick = stopFile;
-$('loopBtn').onclick = e=>{
-loopEnabled=!loopEnabled;
-e.target.textContent='🔁 Loop: '+(loopEnabled?'ON':'OFF');
-e.target.classList.toggle('active',loopEnabled); e.target.classList.toggle('inactive',!loopEnabled);
-if(fileSource) fileSource.loop=loopEnabled;
-};
-
-function applyBpmDelay(){ if(bpmSync&&delayNode){ const t=60/currentBPM; delayNode.delayTime.value=Math.min(t,2); $('delayTimeValue').textContent=Math.min(t,2).toFixed(2)+' s'; $('delayTime').value=Math.min(t,2);} }
-$('bpmSlider').oninput = e=>{ currentBPM=+e.target.value; $('bpmValue').textContent=currentBPM; applyBpmDelay(); };
-$('bpmSyncBtn').onclick = e=>{ bpmSync=!bpmSync; e.target.textContent='Sync Delay al BPM: '+(bpmSync?'ON':'OFF'); e.target.classList.toggle('active',bpmSync); e.target.classList.toggle('inactive',!bpmSync); applyBpmDelay(); };
-
-$('filterFreq').oninput = e=>{ if(filter)filter.frequency.value=+e.target.value; $('filterFreqValue').textContent=e.target.value+' Hz'; };
-$('filterQ').oninput = e=>{ if(filter)filter.Q.value=+e.target.value; $('filterQValue').textContent=(+e.target.value).toFixed(1); };
-$('filterType').onchange = e=>{ if(filter)filter.type=e.target.value; };
-
-$('delayTime').oninput = e=>{ if(delayNode)delayNode.delayTime.value=+e.target.value; $('delayTimeValue').textContent=(+e.target.value).toFixed(2)+' s'; };
-$('delayFeedback').oninput = e=>{ if(delayFeedback)delayFeedback.gain.value=+e.target.value; $('delayFeedbackValue').textContent=(+e.target.value).toFixed(2); };
-$('delayMix').oninput = e=>{ if(delayMix)delayMix.gain.value=+e.target.value; $('delayMixValue').textContent=(+e.target.value).toFixed(2); };
-$('delayToggle').onclick = e=>{
-delayEnabled=!delayEnabled;
-e.target.textContent='Delay: '+(delayEnabled?'ON':'OFF');
-e.target.classList.toggle('active',delayEnabled); e.target.classList.toggle('inactive',!delayEnabled);
-if(delayMix) delayMix.gain.value = delayEnabled ? +$('delayMix').value : 0;
-};
-
-$('chorusDepth').oninput = e=>{ if(chorusDepthGain)chorusDepthGain.gain.value=+e.target.value; $('chorusDepthValue').textContent=(+e.target.value).toFixed(4); };
-$('chorusRate').oninput = e=>{ if(chorusLFO)chorusLFO.frequency.value=+e.target.value; $('chorusRateValue').textContent=(+e.target.value).toFixed(1)+' Hz'; };
-$('chorusMix').oninput = e=>{ $('chorusMixValue').textContent=(+e.target.value).toFixed(2); if(chorusEnabled)chorusMixGain.gain.value=+e.target.value; };
-$('chorusToggle').onclick = e=>{
-chorusEnabled=!chorusEnabled;
-e.target.textContent='Chorus: '+(chorusEnabled?'ON':'OFF');
-e.target.classList.toggle('active',chorusEnabled); e.target.classList.toggle('inactive',!chorusEnabled);
-if(chorusMixGain) chorusMixGain.gain.value = chorusEnabled ? +$('chorusMix').value : 0;
-};
-
-function updateCrush(){
-if(!bcMixGain) return;
-const m = +$('bitcrusherMix').value;
-bcMixGain.gain.value = bitcrusherEnabled ? m : 0;
-dryGain.gain.value = bitcrusherEnabled ? (1-m) : 1;
-}
-$('bitcrusherBits').oninput = e=>{ bcBits=+e.target.value; $('bitcrusherBitsValue').textContent=e.target.value; };
-$('bitcrusherSampleRate').oninput = e=>{ bcRate=+e.target.value; $('bitcrusherSampleRateValue').textContent=(+e.target.value).toFixed(2); };
-$('bitcrusherMix').oninput = e=>{ $('bitcrusherMixValue').textContent=(+e.target.value).toFixed(2); updateCrush(); };
-$('bitcrusherToggle').onclick = e=>{
-bitcrusherEnabled=!bitcrusherEnabled;
-e.target.textContent='Bitcrusher: '+(bitcrusherEnabled?'ON':'OFF');
-e.target.classList.toggle('active',bitcrusherEnabled); e.target.classList.toggle('inactive',!bitcrusherEnabled);
-updateCrush();
-};
-
-$('legatoGlide').oninput = e=>{ legatoGlide=+e.target.value; $('legatoGlideValue').textContent=legatoGlide.toFixed(2)+' s'; };
-$('legatoToggle').onclick = e=>{
-legatoEnabled=!legatoEnabled;
-e.target.textContent='Legato: '+(legatoEnabled?'ON':'OFF');
-e.target.classList.toggle('active',legatoEnabled); e.target.classList.toggle('inactive',!legatoEnabled);
-};
-
-$('masterVolume').oninput = e=>{
-const v=+e.target.value; $('masterVolumeValue').textContent=v.toFixed(2);
-if(masterGain&&isFilePlaying) masterGain.gain.value=v;
-};
-
-$('resetFxBtn').onclick = ()=>{
-const def={filterFreq:20000,filterQ:1,delayTime:0.3,delayFeedback:0.4,delayMix:0.3,chorusDepth:0.002,chorusRate:1.5,chorusMix:0.5,bitcrusherBits:16,bitcrusherSampleRate:1,bitcrusherMix:0.5,masterVolume:0.7};
-Object.entries(def).forEach(([id,v])=>{ const el=$(id); el.value=v; el.dispatchEvent(new Event('input')); });
-$('filterType').value='lowpass'; if(filter)filter.type='lowpass';
-};
-
-// sblocco audio al primo tocco (mobile)
-document.addEventListener('touchstart',()=>{ initAudio(); if(audioContext.state==='suspended')audioContext.resume(); },{once:true});
-document.addEventListener('click',()=>{ initAudio(); if(audioContext.state==='suspended')audioContext.resume(); },{once:true});
+function resume(){audioInit();if(audio.state==='suspended')audio.resume()}
+function trigger(i,duration){resume();const midi=noteData(i),freq=440*Math.pow(2,(midi-69)/12),now=audio.currentTime;const osc=audio.createOscillator(),sub=audio.createOscillator(),gain=audio.createGain(),filter=audio.createBiquadFilter();osc.type='triangle';osc.frequency.setValueAtTime(freq,now);sub.type='sine';sub.frequency.setValueAtTime(freq/2,now);filter.type='lowpass';filter.frequency.value=3500;filter.Q.value=.7;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.22,now+(legato?.045:.012));osc.connect(filter);sub.connect(filter);filter.connect(gain);gain.connect(fx.input);fx.input.connect(fx.chorus.delay);fx.input.connect(fx.flanger.delay);fx.input.connect(fx.crush.node);fx.input.connect(fx.delay.node);if(legato){for(const [id,v]of voices){if(id!==i){v.gain.gain.cancelScheduledValues(now);v.gain.gain.setTargetAtTime(.0001,now,.04);setTimeout(()=>stopVoice(id),180)}}}if(voices.has(i))stopVoice(i);voices.set(i,{osc,sub,gain});osc.start();sub.start();const pad=document.querySelector(`[data-pad="${i}"]`);if(pad)pad.classList.add('sounding');if(duration&&!sustain)setTimeout(()=>release(i),duration)}
+function release(i){if(sustain)return;const v=voices.get(i);if(!v)return;const now=audio.currentTime;v.gain.gain.cancelScheduledValues(now);v.gain.gain.setTargetAtTime(.0001,now,.08);setTimeout(()=>stopVoice(i),450)}
+function stopVoice(i){const v=voices.get(i);if(!v)return;try{v.osc.stop();v.sub.stop()}catch(_){}voices.delete(i);const pad=document.querySelector(`[data-pad="${i}"]`);if(pad)pad.classList.remove('sounding')}
+function selectPad(i){selected=i;document.querySelectorAll('.pad').forEach(p=>p.classList.toggle('active',+p.dataset.pad===i));$('selectedNote').textContent=noteName(noteData(i))}
+const fills={straight:[0,4,8,12],offbeat:[2,6,10,14],shuffle:[0,3,6,8,11,14],build:[0,4,8,10,11,12,13,14,15],sparse:[0,7,10]};
+document.querySelectorAll('.fill').forEach(btn=>btn.onclick=()=>{currentFill=btn.dataset.fill;pattern=Array(16).fill(false);fills[currentFill].forEach(i=>pattern[i]=true);document.querySelectorAll('.fill').forEach(b=>b.classList.toggle('active',b===btn));renderSteps();$('sequenceStatus').textContent=btn.textContent.replace(' · ',' — ')+' caricato · '+fills[currentFill].length+' colpi per battuta.'});
+function paintStep(i){document.querySelectorAll('.step').forEach((el,n)=>el.classList.toggle('current',n===i))}
+function tick(){if(!playing)return;stepIndex=(stepIndex+1)%16;paintStep(stepIndex);if(pattern[stepIndex])trigger(selected,Math.max(70,(60/bpm)*250));const ms=60000/bpm/4;timer=setTimeout(tick,ms)}
+$('playBtn').onclick=()=>{resume();playing=!playing;if(playing){stepIndex=-1;$('playBtn').textContent='Ⅱ Pausa';$('playBtn').classList.add('playing');tick()}else{clearTimeout(timer);$('playBtn').textContent='▶ Riprendi';$('playBtn').classList.remove('playing')}};
+$('stopBtn').onclick=()=>{playing=false;clearTimeout(timer);stepIndex=-1;paintStep(-1);$('playBtn').textContent='▶ Avvia pattern';$('playBtn').classList.remove('playing');[...voices.keys()].forEach(stopVoice)};
+$('bpm').oninput=e=>{bpm=+e.target.value;$('bpmReadout').textContent=bpm};
+$('scale').onchange=()=>{renderPads();selectPad(selected)};$('root').onchange=()=>{renderPads();selectPad(selected)};
+document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;const i=keyMap.indexOf(e.key.toLowerCase());if(i<0)return;e.preventDefault();selectPad(i);trigger(i)});
+document.addEventListener('keyup',e=>{const i=keyMap.indexOf(e.key.toLowerCase());if(i>=0)release(i)});
+function toggleButton(id,label,onChange){const el=$(id);el.onclick=()=>{const on=el.getAttribute('aria-pressed')!=='true';el.setAttribute('aria-pressed',String(on));el.classList.toggle('active',on);onChange(on);return on}}
+toggleButton('sustainBtn','Sustain',on=>{sustain=on;$('sustainBtn').textContent='Sustain · '+(on?'ON':'OFF');if(!on)[...voices.keys()].forEach(release)});toggleButton('legatoBtn','Legato',on=>{legato=on;$('legatoBtn').textContent='Legato · '+(on?'ON':'OFF')});toggleButton('delayBtn','Delay',on=>{delayOn=on;fx.delay?.wet.gain.setTargetAtTime(on?.18:0,audio.currentTime,.02);$('delayBtn').textContent='Delay · '+(on?'ON':'OFF')});
+function fxToggle(button,name){toggleButton(button,name,on=>{audioInit();fx[name].wet.gain.setTargetAtTime(on?+$(`${name}Mix`).value:0,audio.currentTime,.03);$(button).textContent=on?'ON':'OFF'})}fxToggle('chorusBtn','chorus');fxToggle('flangerBtn','flanger');fxToggle('crushBtn','crush');
+[['chorusMix','chorus','chorusValue','%'],['flangerMix','flanger','flangerValue','%'],['crushMix','crush','crushValue','%']].forEach(([id,name,out,suffix])=>$(id).oninput=e=>{const v=+e.target.value;$(out).textContent=Math.round(v*100)+suffix;if($(name+'Btn').getAttribute('aria-pressed')==='true'&&fx[name])fx[name].wet.gain.setTargetAtTime(v,audio.currentTime,.03)});
+$('resetFx').onclick=()=>{[['chorusMix','.35'],['flangerMix','.25'],['crushMix','.35']].forEach(([id,v])=>{$(id).value=v;$(id).dispatchEvent(new Event('input'))});['chorusBtn','flangerBtn','crushBtn'].forEach(id=>{const el=$(id);el.setAttribute('aria-pressed','false');el.classList.remove('active');el.textContent='OFF';const name=id==='chorusBtn'?'chorus':id==='flangerBtn'?'flanger':'crush';if(fx[name])fx[name].wet.gain.setTargetAtTime(0,audio.currentTime,.02)});};
+renderPads();renderSteps();selectPad(0);
+})();
 </script>
 </body>
 </html>
